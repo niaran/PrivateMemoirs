@@ -1,0 +1,14 @@
+public Entities(string str)
+    : base(str)
+{
+    Database.Connection.ConnectionString = str;
+}
+
+protected override void OnModelCreating(DbModelBuilder modelBuilder)
+{
+    modelBuilder.Entity<USERS>().HasKey(u => new { u.USER_GUID });
+    modelBuilder.Entity<MEMOIRS>().HasKey(m => new { m.MEMOIR_ID });
+}
+
+using System.ComponentModel.DataAnnotations;
+[Key]

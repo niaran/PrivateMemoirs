@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="DialogManagement.DialogBaseControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:ClassModifier="internal"
+             x:Name="root">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Dictionary.xaml" />
+                <ResourceDictionary Source="DialogContentStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <ContentControl Name="BackgroundImageHolder" />
+        <Border Background="#50000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" DataContext="{Binding ElementName=root}">
+            <Grid Background="#BFBFA1" Margin="30" HorizontalAlignment="{Binding HorizontalDialogAlignment}" VerticalAlignment="{Binding VerticalDialogAlignment}">
+                <ContentControl Style="{StaticResource ContentStyle1}">
+                    <DockPanel>
+                        <Grid Margin="2" DockPanel.Dock="Top" Visibility="{Binding CaptionVisibility}">
+                            <TextBlock Margin="20,10" TextBlock.FontSize="25" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Caption}" />
+                        </Grid>
+                        <UniformGrid Name="ButtonsGrid" DockPanel.Dock="Bottom" Margin="10" HorizontalAlignment="Center" />
+                        <ScrollViewer ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" Margin="2">
+                            <ContentControl Name="CustomContent" Margin="15" />
+                        </ScrollViewer>
+                    </DockPanel>
+                </ContentControl>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,140 @@
+﻿<Window x:Class="PrivateMemoirsClient.AuthorizationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PrivateMemoirsClient"
+        mc:Ignorable="d"
+        Title="Вход в личные воспоминания" Height="228" Width="370"
+        Background="#BFBFA1"
+        Icon="Client.ico"
+        FontSize="14" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
+    <StackPanel >
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="0"/>
+            </Grid.RowDefinitions>
+            <Label x:Name="label1"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       Content="Сервер:"
+                       Foreground="White"
+               Grid.Row="1" Grid.Column="1"/>
+            <Label x:Name="label4"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       Content="Порт:"
+                       Foreground="White"
+               Grid.Row="1" Grid.Column="2" Margin="160,0,0,0"/>
+            <Label x:Name="label3"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       Content="Логин:"
+                       Foreground="White"
+               Grid.Row="3" Grid.Column="1"/>
+            <Label x:Name="label2"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       Content="Пороль:"
+                       Foreground="White"
+               Grid.Row="5" Grid.Column="1"/>
+            <TextBox x:Name="textBoxServer"
+                         Height="26"
+                 Width="150" Text="127.0.0.1"
+                     HorizontalAlignment="Left"
+                         VerticalAlignment="Center"
+                         Background="WhiteSmoke"
+                         BorderBrush="Black"
+                         Padding="2"
+                         SelectionBrush="#BFBFA1"
+                         TextWrapping="Wrap"
+                 Grid.Row="1" Grid.Column="2"/>
+            <TextBox x:Name="textBoxPort"
+                         Height="26" Text="8877"
+                         VerticalAlignment="Center"
+                         Background="WhiteSmoke"
+                         BorderBrush="Black"
+                         Padding="2"
+                         SelectionBrush="#BFBFA1"
+                         TextWrapping="Wrap"
+                 Grid.Row="1" Grid.Column="2" Margin="214,0,0,0"/>
+            <TextBox x:Name="textBoxLogin"
+                         Height="26"
+                         VerticalAlignment="Center"
+                         Background="WhiteSmoke"
+                         BorderBrush="Black"
+                         Padding="2" Text="Kirill"
+                         SelectionBrush="#BFBFA1"
+                         TextWrapping="Wrap"
+                 Grid.Row="3" Grid.Column="2" Margin="0,0,0,0"/>
+            <PasswordBox x:Name="textBoxPassword"  
+                         Height="26" Margin="0,0,0,0"
+                         VerticalAlignment="Center"
+                         Background="WhiteSmoke"
+                         BorderBrush="Black"
+                         Padding="2"
+                         SelectionBrush="#BFBFA1"
+                 Grid.Row="5" Grid.Column="2" TabIndex="1" KeyDown="textBoxPassword_KeyDown"/>
+        </Grid>
+        <Label x:Name="labelStatus"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Content="Статус: Входите"
+                       Foreground="White"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="40"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="40"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="10"/>
+            </Grid.RowDefinitions>
+            <Button x:Name="buttonRegistration"
+                        Width="100"
+                        Height="25"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Click="buttonRegistration_Click"
+                        Content="Регистрация"
+                        Style="{StaticResource ResourceKey=DefaultStyle}"
+                Grid.Row="1" Grid.Column="1" TabIndex="4"/>
+            <Button x:Name="buttonEnter"
+                        Width="70"
+                        Height="25"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Click="buttonEnter_Click"
+                        Content="Войти"
+                        Style="{StaticResource ResourceKey=ContinueStyle}"
+                Grid.Row="1" Grid.Column="5" TabIndex="2"/>
+            <Button x:Name="buttonClose"
+                        Width="70"
+                        Height="30"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Bottom"
+                        Click="buttonClose_Click"
+                        Content="Отмена"
+                        Style="{StaticResource ResourceKey=DefaultStyle}"
+                Grid.Row="1" Grid.Column="3" TabIndex="3" />
+        </Grid>
+    </StackPanel>
+</Window>
