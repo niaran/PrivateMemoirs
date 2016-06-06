@@ -104,7 +104,6 @@
                Margin="0,5,40,0"
                HorizontalAlignment="Right"
                VerticalAlignment="Top"
-               Content="Kirill"
                Foreground="White" />
         <Label x:Name="label4"
                Width="65"

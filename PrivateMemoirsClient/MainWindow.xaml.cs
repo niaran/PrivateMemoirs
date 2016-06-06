@@ -43,10 +43,14 @@ namespace PrivateMemoirsClient
         private AgentRelay agent;
         private ObservableCollection<LogMessage> LogMessages { get; set; }
 
-        public MainWindow(AgentRelay agent)
+        public MainWindow()
         {
             InitializeComponent();
+        }
+        public MainWindow(AgentRelay agent, string userLogin)
+        {
             this.agent = agent;
+            label3.Content = userLogin;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
