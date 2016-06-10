@@ -5,15 +5,15 @@
         xmlns:local="clr-namespace:PrivateMemoirsClient"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         Title="Вход в личные воспоминания"
-        Width="370"
-        Height="228"
+        Width="400"
+        Height="255"
         Background="#BFBFA1"
         FontSize="14"
         Icon="Client.ico"
         Loaded="Window_Loaded"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
-        mc:Ignorable="d">
+        mc:Ignorable="d" Closing="Window_Closing">
     <Grid>
         <StackPanel x:Name="StackPanelMain">
             <Grid>
@@ -21,16 +21,16 @@
                     <ColumnDefinition Width="10" />
                     <ColumnDefinition Width="70" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="20" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="10" />
+                    <RowDefinition Height="20" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="30" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="10" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="10" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="0" />
+                    <RowDefinition Height="20" />
                 </Grid.RowDefinitions>
                 <Label x:Name="label1"
                        Grid.Row="1"
@@ -109,27 +109,22 @@
                              BorderBrush="Black"
                              KeyDown="textBoxPassword1_KeyDown"
                              Padding="2"
+                             Password="123"
                              SelectionBrush="#BFBFA1"
-                             TabIndex="1"
-                             Password="123" />
+                             TabIndex="1" />
             </Grid>
-            <Label x:Name="labelStatus"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   Content="Статус: Входите"
-                   Foreground="White" />
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="20" />
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="50" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="50" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="5" />
+                    <RowDefinition Height="10" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="10" />
                 </Grid.RowDefinitions>
@@ -172,11 +167,13 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="10" />
-                    <ColumnDefinition Width="140" />
+                    <ColumnDefinition Width="70" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="20" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="20" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="10" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="10" />
@@ -185,15 +182,55 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="0" />
                 </Grid.RowDefinitions>
-                <Label x:Name="label5"
+                <Label x:Name="label7"
                        Grid.Row="1"
+                       Grid.Column="1"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       Content="Сервер:"
+                       Foreground="White" />
+                <Label x:Name="label6"
+                       Grid.Row="1"
+                       Grid.Column="2"
+                       Margin="160,0,0,0"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       Content="Порт:"
+                       Foreground="White" />
+                <TextBox x:Name="textBoxServer2"
+                         Grid.Row="1"
+                         Grid.Column="2"
+                         Width="150"
+                         Height="26"
+                         HorizontalAlignment="Left"
+                         VerticalAlignment="Center"
+                         Background="WhiteSmoke"
+                         BorderBrush="Black"
+                         Padding="2"
+                         SelectionBrush="#BFBFA1"
+                         Text="127.0.0.1"
+                         TextWrapping="Wrap" />
+                <TextBox x:Name="textBoxPort2"
+                         Grid.Row="1"
+                         Grid.Column="2"
+                         Height="26"
+                         Margin="214,0,0,0"
+                         VerticalAlignment="Center"
+                         Background="WhiteSmoke"
+                         BorderBrush="Black"
+                         Padding="2"
+                         SelectionBrush="#BFBFA1"
+                         Text="8877"
+                         TextWrapping="Wrap" />
+                <Label x:Name="label5"
+                       Grid.Row="3"
                        Grid.Column="1"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"
                        Content="Логин:"
                        Foreground="White" />
                 <TextBox x:Name="textBoxLogin2"
-                         Grid.Row="1"
+                         Grid.Row="3"
                          Grid.Column="2"
                          Height="26"
                          Margin="0,0,0,0"
@@ -204,15 +241,15 @@
                          Padding="2"
                          SelectionBrush="#BFBFA1"
                          TextWrapping="Wrap" />
-                <Label x:Name="label6"
-                       Grid.Row="3"
+                <Label x:Name="label8"
+                       Grid.Row="5"
                        Grid.Column="1"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"
                        Content="Пороль:"
                        Foreground="White" />
                 <PasswordBox x:Name="textBoxPassword2"
-                             Grid.Row="3"
+                             Grid.Row="5"
                              Grid.Column="2"
                              Height="26"
                              Margin="0,0,0,0"
@@ -222,15 +259,15 @@
                              KeyDown="textBoxPassword2_KeyDown"
                              Padding="2"
                              SelectionBrush="#BFBFA1" />
-                <Label x:Name="label7"
-                       Grid.Row="5"
+                <Label x:Name="label9"
+                       Grid.Row="7"
                        Grid.Column="1"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"
-                       Content="Повторите пороль:"
+                       Content="Еще раз:"
                        Foreground="White" />
                 <PasswordBox x:Name="textBoxPassword3"
-                             Grid.Row="5"
+                             Grid.Row="7"
                              Grid.Column="2"
                              Height="26"
                              Margin="0,0,0,0"
@@ -243,14 +280,14 @@
             </Grid>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="70" />
+                    <ColumnDefinition Width="90" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="40" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="20" />
+                    <RowDefinition Height="10" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="10" />
                 </Grid.RowDefinitions>

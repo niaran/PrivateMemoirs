@@ -1,36 +1,22 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using static PrivateMemoirEnum.PrivateMemoirEnum;
 
 namespace PrivateMemoirs
 {
     public class PrivateMemoirsServer
     {
+        private Model context;
+
         private short listeningPort;
         private string listeningIPAddress;
         private string msSqlIp;
+        private SHA256Cng sha256;
         private ServerRelay server;
-        private Entities context;
         private ConcurrentDictionary<Guid, User> dictionaryAgents;
-
-        private enum TcpCommands
-        {
-            ServerFailed = 1,
-            ServerOK = 0,
-            ServerBye = 7,
-            ServerGetDataResponse = 10,
-            ClientHello = 100,
-            ClientRegistration = 150,
-            ClientBye = 200,
-            ClientLoginQuery = 20,
-            ClientGetDataQuery = 30,
-            ClientMarkFieldQuery = 40,
-            ClientMarkMemoirQuery = 50,
-            ClientAddDataQuery = 60,
-            ClientUpdateDataQuery = 70,
-            ClientDeleteDataQuery = 80,
-            InvalidCommand = 123
-        };
         
         public PrivateMemoirsServer()
             : this("127.0.0.1", "127.0.0.1")
@@ -50,13 +36,14 @@ namespace PrivateMemoirs
         public void Start()
         {
             dictionaryAgents = new ConcurrentDictionary<Guid, User>();
-            context = new Entities("data source=" + msSqlIp +
+            context = new Model("data source=" + msSqlIp +
                 "\\SQLEXPRESS;initial catalog=MEMOIRS_DB;persist security info=True;user id=PrivateNotes;password=PrivateNotes;MultipleActiveResultSets=True;App=EntityFramework");
 
             server = new ServerRelay(true);
             server.StartServer(listeningIPAddress, listeningPort);
             server.AcceptIncommingConnections = true;
             server.OnNewAgentConnected += Server_OnNewAgentConnected;
+            sha256 = new SHA256Cng();
         }
         
         private void Listener_OnNewPacketReceived(AgentRelay.Packet packet, AgentRelay listener)
@@ -66,34 +53,45 @@ namespace PrivateMemoirs
                 case (byte)TcpCommands.ClientHello:
                     if (!dictionaryAgents.ContainsKey(listener.Guid))
                     {
-                        dictionaryAgents.TryAdd(listener.Guid,
-                            new User { Login = AgentRelay.MakeStringFromPacketContents(packet) });
-                        listener.SendMessage((byte)TcpCommands.ServerOK);
-                    }
-                    else
-                    {
-                        listener.SendMessage((byte)TcpCommands.ServerFailed, "Клиент уже подключен.");
+                        var _login = AgentRelay.MakeStringFromPacketContents(packet);
+                        dictionaryAgents.TryAdd(listener.Guid, null);
+                        var _user = context.USERS.ToList().Find(u => u.USER_LOGIN == _login);
+                        if (_user != null)
+                        {
+                            dictionaryAgents[listener.Guid] = new User
+                            {
+                                Login = _user.USER_LOGIN,
+                                Hash = _user.USER_HASH,
+                                Content = _user
+                            };
+                        }
+                        else
+                        {
+                            dictionaryAgents[listener.Guid] = new User
+                            {
+                                Login = _login
+                            };
+                        }
                     }
                     break;
 
                 case (byte)TcpCommands.ClientLoginQuery:
-                    string hash = AgentRelay.MakeStringFromPacketContents(packet);
-
-                    foreach (var user in context.USERS.ToList())
+                    string hash = GetHash(AgentRelay.MakeStringFromPacketContents(packet));
+                    if (dictionaryAgents[listener.Guid].Hash != null)
                     {
-                        if (user.USER_LOGIN == dictionaryAgents[listener.Guid].Login &&
-                            user.USER_HASH == hash)
+                        if (dictionaryAgents[listener.Guid].Hash == hash)
                         {
-                            dictionaryAgents[listener.Guid].Content = user;
-                            dictionaryAgents[listener.Guid].Hash = hash;
                             dictionaryAgents[listener.Guid].Verified = true;
-                            listener.SendMessage((byte)TcpCommands.ServerOK);
+                            listener.SendMessage((byte)TcpCommands.ServerLoginOK);
                             return;
                         }
-                        listener.SendMessage((byte)TcpCommands.ServerFailed, "Неправильный логин или пароль.");
-                        return;
+                        else
+                        {
+                            listener.SendMessage((byte)TcpCommands.ServerLoginFailed, "Неправильный пароль.");
+                            return;
+                        }
                     }
-                    listener.SendMessage((byte)TcpCommands.ServerFailed, "Такой пользователь не зарегистрирован.");
+                    listener.SendMessage((byte)TcpCommands.ServerLoginFailed, "Такой пользователь не зарегистрирован.");
                     break;
 
                 case (byte)TcpCommands.ClientGetDataQuery:
@@ -228,31 +226,24 @@ namespace PrivateMemoirs
                     listener.SendMessage((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");
                     break;
 
-                case (byte)TcpCommands.ClientRegistration:
+                case (byte)TcpCommands.ClientRegistrationQuery:
                     string login = dictionaryAgents[listener.Guid].Login;
-
-                    var userdb = from user in context.USERS.ToList()
-                                 where user.USER_LOGIN == login
-                                 select user;
-
-                    if (userdb.Count() == 0)
+                    if (context.USERS.ToList().Exists(u => u.USER_LOGIN == login))
                     {
-                        listener.SendMessage((byte)TcpCommands.ServerFailed, "Такой пользователь уже зарегестрирован.");
+                        listener.SendMessage((byte)TcpCommands.ServerRegistrationFailed, "Такой пользователь уже зарегестрирован.");
                         return;
                     }
 
-                    context.USERS.Add(new USERS { USER_LOGIN = login, USER_HASH = AgentRelay.MakeStringFromPacketContents(packet) });
+                    context.USERS.Add(new USERS { USER_LOGIN = login,
+                        USER_HASH = GetHash(AgentRelay.MakeStringFromPacketContents(packet)),
+                        REGISTRATION_DATE = DateTime.Now, USER_GUID = Guid.NewGuid() });
                     context.SaveChanges();
-                    listener.SendMessage((byte)TcpCommands.ServerOK);
+                    listener.SendMessage((byte)TcpCommands.ServerRegistrationOK);
                     break;
 
                 case (byte)TcpCommands.ClientBye:
                     listener.SendMessage((byte)TcpCommands.ServerBye);
                     listener.Disconnect();
-                    break;
-                    
-                default:
-                    listener.SendMessage((byte)TcpCommands.InvalidCommand);
                     break;
             }
         }
@@ -262,30 +253,30 @@ namespace PrivateMemoirs
             agentRelay.OnNewPacketReceived += Listener_OnNewPacketReceived;
         }
 
+        private string GetHash(string pass)
+        {
+            byte[] passByte = Encoding.Default.GetBytes(pass);
+            byte[] hashByte = sha256.ComputeHash(passByte);
+            return BitConverter.ToString(hashByte).Replace("-", "").ToLower();
+        }
+
         public void Stop()
         {
             server.StopServer(true);
             server.Dispose();
+            sha256.Dispose();
             context.Dispose();
         }
-    }
 
-    public enum CurrentMemoirField
-    {
-        NONE = 0,
-        MEMOIR_TEXT = 1,
-        MEMOIR_TITLE = 2,
-        MEMOIR_DATE_CHANGE = 3
-    }
+        private class User
+        {
+            public string Login { get; set; }
+            public string Hash { get; set; }
+            public bool Verified { get; set; } = false;
 
-    public class User
-    {
-        public string Login { get; set; }
-        public string Hash { get; set; }
-        public bool Verified { get; set; } = false;
-
-        public USERS Content { get; set; }
-        public int CurentMemoir { get; set; }
-        public CurrentMemoirField CurrentField { get; set; } = CurrentMemoirField.NONE;
+            public USERS Content { get; set; }
+            public int CurentMemoir { get; set; }
+            public CurrentMemoirField CurrentField { get; set; } = CurrentMemoirField.NONE;
+        }
     }
 }

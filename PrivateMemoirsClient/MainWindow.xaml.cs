@@ -14,33 +14,58 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static PrivateMemoirEnum.PrivateMemoirEnum;
 using DialogManagement;
 using DialogManagement.Contracts;
 
 namespace PrivateMemoirsClient
 {
-    public enum TcpCommands
+    public class Message
     {
-        ServerFailed = 1,
-        ServerOK = 0,
-        ServerBye = 7,
-        ServerGetDataResponse = 10,
-        ClientHello = 100,
-        ClientRegistration = 150,
-        ClientBye = 200,
-        ClientLoginQuery = 20,
-        ClientGetDataQuery = 30,
-        ClientMarkFieldQuery = 40,
-        ClientMarkMemoirQuery = 50,
-        ClientAddDataQuery = 60,
-        ClientUpdateDataQuery = 70,
-        ClientDeleteDataQuery = 80,
-        InvalidCommand = 123
-    };
+        private IMessageDialog _dialogManager;
+        private string _caption;
+        private string _message;
 
-    public partial class MainWindow : Window
+
+        public Message(string caption, string message)
+        {
+            _caption = caption;
+            _message = message;
+        }
+
+        public void Close()
+        {
+            _dialogManager.Close();
+        }
+
+        public void CreateWaitDialog(IDialogManager dialogManager, Action worker = null, Action workerReady = null)
+        {
+            var waitDialog = dialogManager.CreateWaitDialog(_message, DialogMode.None);
+            waitDialog.Caption = _caption;
+            if (workerReady != null)
+                waitDialog.WorkerReady += workerReady;
+            waitDialog.CloseWhenWorkerFinished = false;
+            _dialogManager = waitDialog;
+            if (worker != null)
+                waitDialog.Show(worker);
+            else
+                waitDialog.Show();
+        }
+
+        public void CreateMessageDialog(IDialogManager dialogManager, Action workerReady = null)
+        {
+            var messageDialog = dialogManager.CreateMessageDialog(_message, _caption, DialogMode.Ok);
+            if (workerReady != null)
+                messageDialog.Ok += workerReady;
+            _dialogManager = messageDialog;
+            messageDialog.Show();
+        }
+    }
+
+        public partial class MainWindow : Window
     {
         private AgentRelay agent;
+        private string userLogin;
         private ObservableCollection<LogMessage> LogMessages { get; set; }
 
         public MainWindow()
@@ -50,7 +75,7 @@ namespace PrivateMemoirsClient
         public MainWindow(AgentRelay agent, string userLogin)
         {
             this.agent = agent;
-            label3.Content = userLogin;
+            this.userLogin = userLogin;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -64,11 +89,12 @@ namespace PrivateMemoirsClient
         {
             agent = new AgentRelay();
             agent.OnNewPacketReceived += Agent_OnNewPacketReceived;
-            ViewWaitDialog_WorkerReady(
+            label3.Content = userLogin;
+            /*Message.ViewWaitDialog_WorkerReady(
                new DialogManager(this, Dispatcher),
                "Соеднинение с БД...",
                "Подождите, пожалуйста, пока загрузиться данные из базы данных.",
-               () => System.Threading.Thread.Sleep(5000), Start);
+               () => System.Threading.Thread.Sleep(5000), Start);*/
         }
 
         private void Connect()
@@ -89,29 +115,7 @@ namespace PrivateMemoirsClient
             }
         }
 
-        private void ViewWaitDialog_WorkerReady(IDialogManager dialogManager, string caption, string message, Action A, Action W)
-        {
-            var _dialogManager = dialogManager
-                .CreateWaitDialog(message, DialogMode.None);
-            _dialogManager.Caption = caption;
-            _dialogManager.WorkerReady += W;
-            _dialogManager.Show(A);
-        }
-
-        private void ViewMessageDialog(IDialogManager dialogManager, string Message, string Caption)
-        {
-            var _dialogManager = dialogManager
-                .CreateMessageDialog(Message, Caption, DialogMode.Ok);
-            _dialogManager.Show();
-        }
-
-        private void ErorMessageConnectDB(IDialogManager dialogManager, string Message, string Caption)
-        {
-            var _dialogManager = dialogManager
-                .CreateMessageDialog(Message + "\nПриложение будет закрыто", Caption, DialogMode.Ok);
-            _dialogManager.Ok += Exit;
-            _dialogManager.Show();
-        }
+        
 
         private void Exit()
         {
@@ -125,13 +129,16 @@ namespace PrivateMemoirsClient
 
             }
             catch
-            {
+            {/*
                 Dispatcher.BeginInvoke((Action)(() =>
                 {
-                    ErorMessageConnectDB(new DialogManager(this, Dispatcher), "ПАкет мессадже", "Ошибка");
-                })).Priority = DispatcherPriority.ContextIdle;
+                    Message.ErorMessage(new DialogManager(this, Dispatcher), "ПАкет мессадже", "Ошибка", Error);
+                })).Priority = DispatcherPriority.ContextIdle;*/
             }
         }
+
+        private void Error()
+        { }
 
         private void Start()
         {

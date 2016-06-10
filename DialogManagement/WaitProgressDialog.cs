@@ -101,14 +101,14 @@ namespace DialogManagement
 					_beginWork.WaitOne(-1);
 
 					workerMethod();
-
+                    /*
 					InvokeUICall(() =>
 					{
 						_isReady = true;
 
 						if (WorkerReady != null)
 							WorkerReady();
-
+						
 						if (CloseWhenWorkerFinished)
 						{
 							Close();
@@ -120,7 +120,7 @@ namespace DialogManagement
 
 						DialogBaseControl.RemoveButtons();
 						DialogBaseControl.AddOkButton();
-					});
+					});*/
 				}
 				catch (Exception ex)
 				{

@@ -22,7 +22,7 @@
         <Path Width="100"
               Height="100"
               Stretch="Fill"
-              Stroke="#BFBFA1"
+              Stroke="WhiteSmoke"
               StrokeThickness="0.5">
             <Path.Fill>
                 <RadialGradientBrush GradientOrigin="0,1" RadiusX="0.4" RadiusY="0.4">

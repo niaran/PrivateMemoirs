@@ -4,7 +4,7 @@
              xmlns:wa="clr-namespace:DialogManagement"
              Name="root"
              Background="WhiteSmoke">
-    <StackPanel Width="200"
+    <StackPanel
                 VerticalAlignment="Center"
                 DataContext="{Binding ElementName=root}">
         <wa:WaitAnimation Margin="10"
@@ -14,11 +14,5 @@
                    HorizontalAlignment="Center"
                    Text="{Binding DisplayText}"
                    TextWrapping="Wrap" />
-        <ProgressBar Height="30"
-                     Margin="10"
-                     Maximum="100"
-                     Minimum="0"
-                     Visibility="{Binding ProgressVisibility}"
-                     Value="{Binding Progress}" />
     </StackPanel>
 </UserControl>

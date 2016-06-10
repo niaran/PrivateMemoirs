@@ -16,6 +16,11 @@ namespace PrivateMemoirs
                 {
                     memoirsServer = new PrivateMemoirsServer(options.msSqlHostNameOrAddress,
                         options.listeningIPAddress, options.listeningPort);
+                    Console.CancelKeyPress += delegate
+                    {
+                        Console.WriteLine("Private Memoirs Server has stopping...");
+                        memoirsServer.Stop();
+                    };
                     Console.WriteLine("Private Memoirs Server has been started!\nPress Ctrl+C to Stop it.");
                     memoirsServer.Start();
                 }

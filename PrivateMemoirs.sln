@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DialogManagement", "DialogM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfRichText", "WpfRichText\WpfRichText.csproj", "{78147C43-DB7B-4571-BC7A-E7F0075B4B78}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrivateMemoir", "PrivateMemoir\PrivateMemoir.csproj", "{5F14DDB1-0CD0-4158-A1BE-5DE2059F115B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,14 @@ Global
 		{78147C43-DB7B-4571-BC7A-E7F0075B4B78}.Release|Any CPU.Build.0 = Release|Any CPU
 		{78147C43-DB7B-4571-BC7A-E7F0075B4B78}.Release|x64.ActiveCfg = Release|Any CPU
 		{78147C43-DB7B-4571-BC7A-E7F0075B4B78}.Release|x64.Build.0 = Release|Any CPU
+		{5F14DDB1-0CD0-4158-A1BE-5DE2059F115B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F14DDB1-0CD0-4158-A1BE-5DE2059F115B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F14DDB1-0CD0-4158-A1BE-5DE2059F115B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5F14DDB1-0CD0-4158-A1BE-5DE2059F115B}.Debug|x64.Build.0 = Debug|Any CPU
+		{5F14DDB1-0CD0-4158-A1BE-5DE2059F115B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F14DDB1-0CD0-4158-A1BE-5DE2059F115B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F14DDB1-0CD0-4158-A1BE-5DE2059F115B}.Release|x64.ActiveCfg = Release|Any CPU
+		{5F14DDB1-0CD0-4158-A1BE-5DE2059F115B}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

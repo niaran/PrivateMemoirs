@@ -133,6 +133,10 @@
       <Project>{104d608c-81ef-4110-b0fa-6e78166f93d0}</Project>
       <Name>DialogManagement</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PrivateMemoir\PrivateMemoir.csproj">
+      <Project>{5f14ddb1-0cd0-4158-a1be-5de2059f115b}</Project>
+      <Name>PrivateMemoir</Name>
+    </ProjectReference>
     <ProjectReference Include="..\WpfRichText\WpfRichText.csproj">
       <Project>{78147c43-db7b-4571-bc7a-e7f0075b4b78}</Project>
       <Name>WpfRichText</Name>

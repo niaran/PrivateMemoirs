@@ -5,15 +5,15 @@
             <Setter Property="Control.Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ContentControl}">
-                        <Border BorderBrush="#BFBFA1" BorderThickness="1">
+                        <Border BorderBrush="WhiteSmoke" BorderThickness="1">
                             <Grid>
-                                <Rectangle Fill="#BFBFA1">
+                                <Rectangle Fill="WhiteSmoke">
                                     <Rectangle.BitmapEffect>
                                         <DropShadowBitmapEffect Direction="270"
                                                                 Opacity="0.5"
                                                                 ShadowDepth="7"
                                                                 Softness="0.8"
-                                                                Color="#403C35" />
+                                                                Color="Black" />
                                     </Rectangle.BitmapEffect>
                                 </Rectangle>
                                 <ContentPresenter />
