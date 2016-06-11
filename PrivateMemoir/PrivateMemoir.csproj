@@ -43,6 +43,12 @@
     <Compile Include="PrivateMemoirEnum.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DialogManagement\DialogManagement.csproj">
+      <Project>{104d608c-81ef-4110-b0fa-6e78166f93d0}</Project>
+      <Name>DialogManagement</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

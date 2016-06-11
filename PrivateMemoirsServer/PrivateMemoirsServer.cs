@@ -72,6 +72,7 @@ namespace PrivateMemoirs
                                 Login = _login
                             };
                         }
+                        listener.SendMessage((byte)TcpCommands.ServerHello);
                     }
                     break;
 

@@ -15,65 +15,19 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using static PrivateMemoirEnum.PrivateMemoirEnum;
-using DialogManagement;
-using DialogManagement.Contracts;
+
 
 namespace PrivateMemoirsClient
 {
-    public class Message
-    {
-        private IMessageDialog _dialogManager;
-        private string _caption;
-        private string _message;
-
-
-        public Message(string caption, string message)
-        {
-            _caption = caption;
-            _message = message;
-        }
-
-        public void Close()
-        {
-            _dialogManager.Close();
-        }
-
-        public void CreateWaitDialog(IDialogManager dialogManager, Action worker = null, Action workerReady = null)
-        {
-            var waitDialog = dialogManager.CreateWaitDialog(_message, DialogMode.None);
-            waitDialog.Caption = _caption;
-            if (workerReady != null)
-                waitDialog.WorkerReady += workerReady;
-            waitDialog.CloseWhenWorkerFinished = false;
-            _dialogManager = waitDialog;
-            if (worker != null)
-                waitDialog.Show(worker);
-            else
-                waitDialog.Show();
-        }
-
-        public void CreateMessageDialog(IDialogManager dialogManager, Action workerReady = null)
-        {
-            var messageDialog = dialogManager.CreateMessageDialog(_message, _caption, DialogMode.Ok);
-            if (workerReady != null)
-                messageDialog.Ok += workerReady;
-            _dialogManager = messageDialog;
-            messageDialog.Show();
-        }
-    }
-
-        public partial class MainWindow : Window
+    public partial class MainWindow : Window
     {
         private AgentRelay agent;
         private string userLogin;
         private ObservableCollection<LogMessage> LogMessages { get; set; }
 
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
         public MainWindow(AgentRelay agent, string userLogin)
         {
+            InitializeComponent();
             this.agent = agent;
             this.userLogin = userLogin;
         }
@@ -87,19 +41,9 @@ namespace PrivateMemoirsClient
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            agent = new AgentRelay();
             agent.OnNewPacketReceived += Agent_OnNewPacketReceived;
             label3.Content = userLogin;
-            /*Message.ViewWaitDialog_WorkerReady(
-               new DialogManager(this, Dispatcher),
-               "Соеднинение с БД...",
-               "Подождите, пожалуйста, пока загрузиться данные из базы данных.",
-               () => System.Threading.Thread.Sleep(5000), Start);*/
-        }
-
-        private void Connect()
-        {
-            agent.Connect("127.0.0.1", 8877);
+            Start();
         }
 
         private void Agent_OnNewPacketReceived(AgentRelay.Packet packet, AgentRelay agentRelay)
@@ -114,31 +58,6 @@ namespace PrivateMemoirsClient
                     break;
             }
         }
-
-        
-
-        private void Exit()
-        {
-            Environment.Exit(1);
-        }
-
-        private void GetDATA()
-        {
-            try
-            {
-
-            }
-            catch
-            {/*
-                Dispatcher.BeginInvoke((Action)(() =>
-                {
-                    Message.ErorMessage(new DialogManager(this, Dispatcher), "ПАкет мессадже", "Ошибка", Error);
-                })).Priority = DispatcherPriority.ContextIdle;*/
-            }
-        }
-
-        private void Error()
-        { }
 
         private void Start()
         {
@@ -155,12 +74,12 @@ namespace PrivateMemoirsClient
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            agent.SendMessage((byte)TcpCommands.ClientHello, "Kirill");
+            
         }
 
         private void button2_Click(object sender, RoutedEventArgs e)
         {
-            Connect();
+            
         }
 
         private void button3_Click(object sender, RoutedEventArgs e)

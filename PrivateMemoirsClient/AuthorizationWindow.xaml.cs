@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Threading;
 using System.Windows.Threading;
 using System.Windows.Input;
 using System.Text.RegularExpressions;
@@ -13,6 +14,7 @@ namespace PrivateMemoirsClient
     {
         private AgentRelay agent;
         private Message message;
+        private Thread serverResponseTimeout;
 
         public AuthorizationWindow()
         {
@@ -43,6 +45,7 @@ namespace PrivateMemoirsClient
             switch (packet.Command)
             {
                 case (byte)TcpCommands.ServerLoginFailed:
+                    serverResponseTimeout.Abort();
                     Dispatcher.BeginInvoke(new Action(() =>
                     {
                         message.Close();
@@ -52,6 +55,7 @@ namespace PrivateMemoirsClient
                     }));
                     break;
                 case (byte)TcpCommands.ServerLoginOK:
+                    serverResponseTimeout.Abort();
                     Dispatcher.BeginInvoke(new Action(() =>
                     {
                         var mainWindow = new MainWindow(agent, textBoxLogin1.Text);
@@ -61,6 +65,7 @@ namespace PrivateMemoirsClient
                     }));
                     break;
                 case (byte)TcpCommands.ServerRegistrationFailed:
+                    serverResponseTimeout.Abort();
                     Dispatcher.BeginInvoke(new Action(() =>
                     {
                         message.Close();
@@ -73,6 +78,7 @@ namespace PrivateMemoirsClient
                     }));
                     break;
                 case (byte)TcpCommands.ServerRegistrationOK:
+                    serverResponseTimeout.Abort();
                     Dispatcher.BeginInvoke(new Action(() =>
                     {
                         message.Close();
@@ -89,6 +95,9 @@ namespace PrivateMemoirsClient
                         StackPanelMain.Visibility = Visibility.Visible;
                         textBoxLogin1.Focus();
                     }));
+                    break;
+                case (byte)TcpCommands.ServerHello:
+                    serverResponseTimeout.Abort();
                     break;
             }
         }
@@ -138,16 +147,21 @@ namespace PrivateMemoirsClient
             string login = textBoxLogin1.Text.ToLower();
             string pass = textBoxPassword1.Password;
 
-            if (Validation(serverNameOrAddress, serverPort, login, pass))
+            if (ValidationLoginPass(login, pass))
             {
                 message = new Message("Соеднинение с сервером...", "Подождите, пожалуйста," +
                 Environment.NewLine + "пока осуществляется вход.");
                 message.CreateWaitDialog(new DialogManager(this, Dispatcher),
                     () =>
                     {
-                        Connect(serverNameOrAddress, Convert.ToInt32(serverPort));
-                        agent.SendMessage((byte)TcpCommands.ClientHello, login);
-                        agent.SendMessage((byte)TcpCommands.ClientLoginQuery, pass);
+                        if (ValidationServer(serverNameOrAddress, serverPort))
+                        {
+                            Connect(serverNameOrAddress, Convert.ToInt32(serverPort));
+                            agent.SendMessage((byte)TcpCommands.ClientHello, login);
+                            agent.SendMessage((byte)TcpCommands.ClientLoginQuery, pass);
+                            serverResponseTimeout = new Thread(CloseMessage);
+                            serverResponseTimeout.Start();
+                        }
                     });
                 buttonEnter.IsEnabled = true;
             }
@@ -174,16 +188,21 @@ namespace PrivateMemoirsClient
                 return;
             }
 
-            if (Validation(serverNameOrAddress, serverPort, login, pass))
+            if (ValidationLoginPass(login, pass))
             {
                 message = new Message("Соеднинение с сервером...", "Подождите, пожалуйста," +
                 Environment.NewLine + "пока происходит регистрация.");
                 message.CreateWaitDialog(new DialogManager(this, Dispatcher),
                     () =>
                     {
-                        Connect(serverNameOrAddress, Convert.ToInt32(serverPort));
-                        agent.SendMessage((byte)TcpCommands.ClientHello, login);
-                        agent.SendMessage((byte)TcpCommands.ClientRegistrationQuery, pass);
+                        if (ValidationServer(serverNameOrAddress, serverPort))
+                        {
+                            Connect(serverNameOrAddress, Convert.ToInt32(serverPort));
+                            agent.SendMessage((byte)TcpCommands.ClientHello, login);
+                            agent.SendMessage((byte)TcpCommands.ClientRegistrationQuery, pass);
+                            serverResponseTimeout = new Thread(CloseMessage);
+                            serverResponseTimeout.Start();
+                        }
                     });
                 buttonRegistrationOK.IsEnabled = true;
             }
@@ -208,7 +227,7 @@ namespace PrivateMemoirsClient
             }
         }
 
-        private bool Validation(string serverNameOrAddress, string serverPort, string login, string pass)
+        private bool ValidationLoginPass(string login, string pass)
         {
             if (login == "")
             {
@@ -242,15 +261,21 @@ namespace PrivateMemoirsClient
                 message.CreateMessageDialog(new DialogManager(this, Dispatcher));
                 return false;
             }
+            return true;
+        }
 
+        private bool ValidationServer(string serverNameOrAddress, string serverPort)
+        {
             if (serverPort == "")
             {
+                message.Close();
                 message = new Message("Не правильно", "Введите номер порта.");
                 message.CreateMessageDialog(new DialogManager(this, Dispatcher));
                 return false;
             }
             if (!new Regex(@"^[\d]{1,5}$").IsMatch(serverPort))
             {
+                message.Close();
                 message = new Message("Не правильно", "Порт это набор цифр от 1 до 65536.");
                 message.CreateMessageDialog(new DialogManager(this, Dispatcher));
                 return false;
@@ -258,6 +283,7 @@ namespace PrivateMemoirsClient
 
             if (serverNameOrAddress == "")
             {
+                message.Close();
                 message = new Message("Не правильно", "Введите имя или ip адрес сервера.");
                 message.CreateMessageDialog(new DialogManager(this, Dispatcher));
                 return false;
@@ -268,18 +294,34 @@ namespace PrivateMemoirsClient
             }
             catch (System.Net.Sockets.SocketException)
             {
+                message.Close();
                 message = new Message("Не правильно", "Этот сервер не известен.");
                 message.CreateMessageDialog(new DialogManager(this, Dispatcher));
                 return false;
             }
             catch (FormatException)
             {
+                message.Close();
                 message = new Message("Не правильно", "Этот сервер не известен.");
                 message.CreateMessageDialog(new DialogManager(this, Dispatcher));
                 return false;
             }
 
             return true;
+        }
+
+        private void CloseMessage()
+        {
+            Thread.Sleep(10000);
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                message.Close();
+                var mes = new Message("Ошибка", "Превышено время ожидания ответа сервера." + Environment.NewLine +
+                    "Проверьте имя или ip адрес сервера и порт.");
+                mes.CreateMessageDialog(new DialogManager(this, Dispatcher));
+                if (agent.IsConnected)
+                    agent.Disconnect();
+            }));
         }
     }
 }
