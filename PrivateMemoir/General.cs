@@ -2,29 +2,30 @@
 using DialogManagement;
 using DialogManagement.Contracts;
 
-namespace PrivateMemoirEnum
+namespace PrivateMemoirs
 {
-    public static class PrivateMemoirEnum
+    public static class General
     {
-        public enum CurrentMemoirField
+        public enum CurrentMemoirField : byte
         {
             NONE = 0,
             MEMOIR_TEXT = 1,
-            MEMOIR_TITLE = 2,
-            MEMOIR_DATE_CHANGE = 3
+            MEMOIR_DATE_CHANGE = 2
         }
 
-        public enum TcpCommands
+        public enum TcpCommands : byte
         {
-            ServerFailed = 1,
             ServerOK = 0,
-            ServerLoginFailed = 3,
+            ServerFailed = 1,
             ServerLoginOK = 2,
-            ServerRegistrationFailed = 5,
-            ServerRegistrationOK = 6,
-            ServerHello = 7,
-            ServerBye = 8,
-            ServerGetDataResponse = 10,
+            ServerLoginFailed = 3,
+            ServerRegistrationFailed = 4,
+            ServerRegistrationOK = 5,
+            ServerHello = 6,
+            ServerBye = 7,
+            ServerGetDataResponse = 8,
+            ServerGetDataMarkResponse = 9,
+            ServerGetDataMarkMemoirResponse = 10,
             ClientHello = 100,
             ClientRegistrationQuery = 150,
             ClientBye = 200,

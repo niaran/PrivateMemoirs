@@ -15,7 +15,10 @@ namespace PrivateMemoirs
                 if (Parser.Default.ParseArguments(args, options))
                 {
                     memoirsServer = new PrivateMemoirsServer(options.msSqlHostNameOrAddress,
-                        options.listeningIPAddress, options.listeningPort);
+                        options.listeningIPAddress, options.listeningPort, options.loginMsSql,
+                        options.passMsSql, options.dbName);
+                    memoirsServer.NewAgentСonnected += MemoirsServer_NewAgentСonnected;
+                    memoirsServer.AgentDisconnected += MemoirsServer_AgentDisconnected;
                     Console.CancelKeyPress += delegate
                     {
                         Console.WriteLine("Private Memoirs Server has stopping...");
@@ -31,19 +34,41 @@ namespace PrivateMemoirs
             }
         }
 
+        private static void MemoirsServer_AgentDisconnected(string disAgent)
+        {
+            Console.WriteLine(disAgent);
+        }
+
+        private static void MemoirsServer_NewAgentСonnected(string conAgent)
+        {
+            Console.WriteLine(conAgent);
+        }
+
         class Options
         {
-            [Option('m', "msSqlHostNameOrAddress", DefaultValue = "127.0.0.1",
+            [Option('s', "msSqlHostNameOrAddress", DefaultValue = "127.0.0.1",
                 HelpText = "The IP address or domain name of microsoft sql server")]
             public string msSqlHostNameOrAddress { get; set; }
 
-            [Option('l', "listeningIPAddress", Required = true,
+            [Option('i', "listeningIPAddress", Required = true,
                 HelpText = "The local IP address on which to listen for incoming connection.")]
             public string listeningIPAddress { get; set; }
 
-            [Option('p', "listeningPort", Required = true,
+            [Option('o', "listeningPort", Required = true,
                 HelpText = "Local port on which to listen for incoming connection.")]
             public short listeningPort { get; set; }
+
+            [Option('l', "loginMsSql", DefaultValue = "PrivateNotes",
+                HelpText = "Login to enter to the microsoft sql server")]
+            public string loginMsSql { get; set; }
+            
+            [Option('p', "passMsSql", DefaultValue = "PrivateNotes",
+                HelpText = "Password to enter to the microsoft sql server")]
+            public string passMsSql { get; set; }
+
+            [Option('d', "dbName", DefaultValue = "MEMOIRS_DB",
+                HelpText = "Password to enter to the microsoft sql server")]
+            public string dbName { get; set; }
 
             [ParserState]
             public IParserState LastParserState { get; set; }

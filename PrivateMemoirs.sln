@@ -25,7 +25,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DialogManagement", "DialogM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfRichText", "WpfRichText\WpfRichText.csproj", "{78147C43-DB7B-4571-BC7A-E7F0075B4B78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrivateMemoir", "PrivateMemoir\PrivateMemoir.csproj", "{5F14DDB1-0CD0-4158-A1BE-5DE2059F115B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrivateMemoirs", "PrivateMemoir\PrivateMemoirs.csproj", "{5F14DDB1-0CD0-4158-A1BE-5DE2059F115B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

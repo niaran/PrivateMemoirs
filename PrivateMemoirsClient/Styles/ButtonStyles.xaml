@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:linq="clr-namespace:System.Linq;assembly=System.Core"
-                    xmlns:local="clr-namespace:Renderer">
+                    xmlns:local="clr-namespace:PrivateMemoirsClient">
 
     <!--  FocusVisual  -->
     <Style x:Key="ButtonFocusVisual">

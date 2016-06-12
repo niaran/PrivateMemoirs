@@ -42,7 +42,6 @@
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration.Install" />
@@ -76,9 +75,9 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PrivateMemoir\PrivateMemoir.csproj">
+    <ProjectReference Include="..\PrivateMemoir\PrivateMemoirs.csproj">
       <Project>{5f14ddb1-0cd0-4158-a1be-5de2059f115b}</Project>
-      <Name>PrivateMemoir</Name>
+      <Name>PrivateMemoirs</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

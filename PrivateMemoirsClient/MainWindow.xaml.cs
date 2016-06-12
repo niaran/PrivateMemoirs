@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
@@ -14,7 +15,8 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using static PrivateMemoirEnum.PrivateMemoirEnum;
+using PrivateMemoirsUser;
+using static PrivateMemoirs.General;
 
 
 namespace PrivateMemoirsClient
@@ -23,43 +25,34 @@ namespace PrivateMemoirsClient
     {
         private AgentRelay agent;
         private string userLogin;
-        private ObservableCollection<LogMessage> LogMessages { get; set; }
+        private User user;
 
         public MainWindow(AgentRelay agent, string userLogin)
         {
-            InitializeComponent();
             this.agent = agent;
             this.userLogin = userLogin;
+            InitializeComponent();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            agent.SendMessage((byte)TcpCommands.ClientBye);
+            agent.SendPacket((byte)TcpCommands.ClientBye);
             agent.Disconnect();
             agent.Dispose();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            agent.OnNewPacketReceived += Agent_OnNewPacketReceived;
-            label3.Content = userLogin;
-            Start();
+            user = new User();
+            DataContext = user;
+            agent.OnNewPacketReceived += agent_OnNewPacketReceived;
+            agent.SendPacket((byte)TcpCommands.ClientGetDataQuery);
+            Title = "Личные воспоминания | Сегодня: " +
+                    DateTime.Today.ToLongDateString() + " | Пользователь: " + userLogin;
+            StartAnimation();
         }
 
-        private void Agent_OnNewPacketReceived(AgentRelay.Packet packet, AgentRelay agentRelay)
-        {
-            switch (packet.Command)
-            {
-                case (byte)TcpCommands.ServerFailed:
-                    Dispatcher.BeginInvoke(new Action(() => { label1.Content = AgentRelay.MakeStringFromPacketContents(packet); } ));
-                    break;
-                case (byte)TcpCommands.ServerOK:
-                    Dispatcher.BeginInvoke(new Action(() => { label1.Content = AgentRelay.MakeStringFromPacketContents(packet); }));
-                    break;
-            }
-        }
-
-        private void Start()
+        private void StartAnimation()
         {
             Storyboard storyboard = new Storyboard();
             DoubleAnimation da = new DoubleAnimation();
@@ -72,40 +65,78 @@ namespace PrivateMemoirsClient
             storyboard.Begin();
         }
 
+        private void agent_OnNewPacketReceived(AgentRelay.Packet packet, AgentRelay agentRelay)
+        {
+            try
+            {
+                switch (packet.Command)
+                {
+                    case (byte)TcpCommands.ServerOK:
+                        break;
+
+                    case (byte)TcpCommands.ServerGetDataMarkResponse:
+                        byte mark = packet.Content[0];
+                        Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            switch (mark)
+                            {
+                                case (byte)CurrentMemoirField.MEMOIR_TEXT:
+                                    user.CurrentField = CurrentMemoirField.MEMOIR_TEXT;
+                                    break;
+
+                                case (byte)CurrentMemoirField.MEMOIR_DATE_CHANGE:
+                                    user.CurrentField = CurrentMemoirField.MEMOIR_DATE_CHANGE;
+                                    break;
+                            }
+                        }));
+                        break;
+
+                    case (byte)TcpCommands.ServerGetDataMarkMemoirResponse:
+                        int curMemoir = Convert.ToInt32(AgentRelay.MakeStringFromPacketContents(packet));
+                        Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            if (curMemoir == user.CurentMemoir)
+                            {
+                                user.Memoirs.Add(new Memoir());
+                                user.CurentMemoir++;
+                            }
+                        }));
+                        break;
+
+                    case (byte)TcpCommands.ServerGetDataResponse:
+                        string content = AgentRelay.MakeStringFromPacketContents(packet);
+                        Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            switch (user.CurrentField)
+                            {
+                                case CurrentMemoirField.MEMOIR_TEXT:
+                                    user.Memoirs[user.CurentMemoir].MEMOIR_TEXT = content;
+                                    break;
+
+                                case CurrentMemoirField.MEMOIR_DATE_CHANGE:
+                                    user.Memoirs[user.CurentMemoir].MEMOIR_DATE_CHANGE = content;
+                                    break;
+                            }
+                        }));
+                        break;
+                }
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
+        }
+
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            
+            MessageBox.Show(user.Memoirs.Last().MEMOIR_TEXT);
         }
 
         private void button2_Click(object sender, RoutedEventArgs e)
         {
-            
-        }
 
-        private void button3_Click(object sender, RoutedEventArgs e)
-        {
-            textBox1.Clear();
-            sampleEditor.Text = "";
         }
 
         private void button4_Click(object sender, RoutedEventArgs e)
         {
 
-        }
-
-        private class LogMessage
-        {
-            public string Msg { get; set; }
-            public int Severity { get; set; }
-            //code cut...
-        }
-
-        private enum CurrentMemoirField
-        {
-            NONE = 0,
-            MEMOIR_TEXT = 1,
-            MEMOIR_TITLE = 2,
-            MEMOIR_DATE_CHANGE = 3
         }
     }
 }

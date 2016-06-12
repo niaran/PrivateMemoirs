@@ -5,7 +5,7 @@ using System.Windows.Threading;
 using System.Windows.Input;
 using System.Text.RegularExpressions;
 using System.Net;
-using static PrivateMemoirEnum.PrivateMemoirEnum;
+using static PrivateMemoirs.General;
 using DialogManagement;
 
 namespace PrivateMemoirsClient
@@ -36,8 +36,6 @@ namespace PrivateMemoirsClient
                 message.Close();
                 message = null;
             }
-            agent.Disconnect();
-            agent.Dispose();
         }
 
         private void Agent_OnNewPacketReceived(AgentRelay.Packet packet, AgentRelay agentRelay)
@@ -60,8 +58,8 @@ namespace PrivateMemoirsClient
                     {
                         var mainWindow = new MainWindow(agent, textBoxLogin1.Text);
                         message.Close();
-                        mainWindow.Show();
                         Close();
+                        mainWindow.Show();
                     }));
                     break;
                 case (byte)TcpCommands.ServerRegistrationFailed:
@@ -157,8 +155,8 @@ namespace PrivateMemoirsClient
                         if (ValidationServer(serverNameOrAddress, serverPort))
                         {
                             Connect(serverNameOrAddress, Convert.ToInt32(serverPort));
-                            agent.SendMessage((byte)TcpCommands.ClientHello, login);
-                            agent.SendMessage((byte)TcpCommands.ClientLoginQuery, pass);
+                            agent.SendPacket((byte)TcpCommands.ClientHello, login);
+                            agent.SendPacket((byte)TcpCommands.ClientLoginQuery, pass);
                             serverResponseTimeout = new Thread(CloseMessage);
                             serverResponseTimeout.Start();
                         }
@@ -198,8 +196,8 @@ namespace PrivateMemoirsClient
                         if (ValidationServer(serverNameOrAddress, serverPort))
                         {
                             Connect(serverNameOrAddress, Convert.ToInt32(serverPort));
-                            agent.SendMessage((byte)TcpCommands.ClientHello, login);
-                            agent.SendMessage((byte)TcpCommands.ClientRegistrationQuery, pass);
+                            agent.SendPacket((byte)TcpCommands.ClientHello, login);
+                            agent.SendPacket((byte)TcpCommands.ClientRegistrationQuery, pass);
                             serverResponseTimeout = new Thread(CloseMessage);
                             serverResponseTimeout.Start();
                         }
@@ -319,8 +317,6 @@ namespace PrivateMemoirsClient
                 var mes = new Message("Ошибка", "Превышено время ожидания ответа сервера." + Environment.NewLine +
                     "Проверьте имя или ip адрес сервера и порт.");
                 mes.CreateMessageDialog(new DialogManager(this, Dispatcher));
-                if (agent.IsConnected)
-                    agent.Disconnect();
             }));
         }
     }

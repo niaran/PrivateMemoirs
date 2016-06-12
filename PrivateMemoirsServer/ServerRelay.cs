@@ -201,9 +201,9 @@ namespace PrivateMemoirs
                         if (excludedAgent != null && excludedAgent == agent)
                             continue;
                         if (content == null)
-                            agent.SendMessage(cmdCode);
+                            agent.SendPacket(cmdCode);
                         else
-                            agent.SendMessage(cmdCode, content);
+                            agent.SendPacket(cmdCode, content);
                     }
                     catch { }
                 }

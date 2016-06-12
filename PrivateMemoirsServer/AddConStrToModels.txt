@@ -1,0 +1,5 @@
+public Model(string str)
+    : base(str)
+{
+    Database.Connection.ConnectionString = str;
+}

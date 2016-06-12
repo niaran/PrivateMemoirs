@@ -6,10 +6,10 @@
         xmlns:local="clr-namespace:PrivateMemoirsClient"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:rich="clr-namespace:WpfRichText;assembly=WpfRichText"
-        Title="Личные воспоминания"
-        Width="950"
-        Height="480"
-        Background="#BFBFA1"
+        xmlns:user="clr-namespace:PrivateMemoirsUser"
+        Width="880"
+        Height="430"
+        Background="#FF93898F"
         Closing="Window_Closing"
         FontSize="14"
         Icon="Client.ico"
@@ -17,130 +17,81 @@
         Visibility="Visible"
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d">
-    <Grid x:Name="Grid1"
-          Margin="0,0,0,0"
-          Background="#BFBFA1">
-        <Grid.RenderTransform>
+    <Grid x:Name="Grid1" Background="#FF93898F">
+        <!--Grid.RenderTransform>
             <TranslateTransform X="940" Y="0" />
-        </Grid.RenderTransform>
-        <GroupBox x:Name="groupBox2"
-                  Margin="10,10,280,10"
-                  Header="GroupBox"
-                  Style="{StaticResource GroupBoxNoHeaderStyle}">
-            <Grid>
-                <Label x:Name="label1"
-                       Margin="15,18,0,0"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Top"
-                       Content="Тема:"
-                       Foreground="White" />
-                <Button x:Name="button3"
-                        Width="100"
-                        Height="30"
-                        Margin="92,0,0,20"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Bottom"
-                        Click="button3_Click"
-                        Content="Очистить"
-                        Style="{StaticResource ResourceKey=DefaultStyle}" />
-                <Button x:Name="button2"
-                        Width="100"
-                        Height="25"
-                        Margin="0,0,94,20"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Bottom"
-                        Click="button2_Click"
-                        Content="Записать"
-                        Style="{StaticResource ResourceKey=ContinueStyle}" />
-                <TextBox x:Name="textBox1"
-                         Height="26"
-                         Margin="60,20,231,0"
-                         VerticalAlignment="Top"
-                         Background="WhiteSmoke"
-                         BorderBrush="Black"
-                         Padding="2"
-                         SelectionBrush="#BFBFA1"
-                         TextWrapping="Wrap" />
-                <Label x:Name="label2"
-                       Width="70"
-                       Margin="0,18,156,0"
-                       HorizontalAlignment="Right"
-                       VerticalAlignment="Top"
-                       Content="Изменен:"
-                       Foreground="White" />
-                <rich:RichTextEditor x:Name="sampleEditor"
-                                     Grid.Row="2"
-                                     Margin="20,65,20,70"
-                                     Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}"
-                                     BorderBrush="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}"
-                                     BorderThickness="1"
-                                     Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
-                                     IsContextMenuEnabled="True"
-                                     IsReadOnly="False"
-                                     IsToolBarVisible="True"
-                                     Text="{Binding Text,
-                                                    Mode=TwoWay}" />
-            </Grid>
-        </GroupBox>
+        </Grid.RenderTransform-->
+        <rich:RichTextEditor x:Name="sampleEditor"
+                             Margin="270,0,0,0"
+                             Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}"
+                             BorderBrush="#FF93898F"
+                             Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                             IsContextMenuEnabled="True"
+                             IsReadOnly="False"
+                             IsToolBarVisible="True"
+                             Text="{Binding SelectedItem.MEMOIR_TEXT,
+                                            ElementName=listBox,
+                                            Mode=TwoWay}" />
         <Button x:Name="button1"
-                Width="70"
-                Height="30"
-                Margin="0,0,161,20"
-                HorizontalAlignment="Right"
+                Width="40"
+                Height="40"
+                Margin="20,0,0,10"
+                HorizontalAlignment="Left"
                 VerticalAlignment="Bottom"
-                Click="button1_Click"
-                Content="Удалить"
-                Style="{StaticResource ResourceKey=ClearStyle}" />
-        <Button x:Name="button4"
-                Width="70"
-                Height="30"
-                Margin="0,0,40,20"
-                HorizontalAlignment="Right"
+                Click="button1_Click">
+            <Button.Background>
+                <ImageBrush ImageSource="delete.ico" />
+            </Button.Background>
+        </Button>
+        <Button x:Name="button2"
+                Width="40"
+                Height="40"
+                Margin="100,0,0,10"
+                HorizontalAlignment="Left"
                 VerticalAlignment="Bottom"
-                Click="button4_Click"
-                Content="Выделить"
-                Style="{StaticResource ResourceKey=DefaultStyle}" />
-        <Label x:Name="label3"
-               Margin="0,5,40,0"
-               HorizontalAlignment="Right"
-               VerticalAlignment="Top"
-               Foreground="White" />
-        <Label x:Name="label4"
-               Width="65"
-               Margin="0,5,210,0"
-               HorizontalAlignment="Right"
-               VerticalAlignment="Top"
-               Content="Сегодня:"
-               Foreground="White" />
-        <Label x:Name="label5"
-               Width="102"
-               Margin="0,5,113,0"
-               HorizontalAlignment="Right"
-               VerticalAlignment="Top"
-               Content="{x:Static local:Dt.DateTodayLong}"
-               Foreground="White" />
+                Click="button2_Click">
+            <Button.Background>
+                <ImageBrush ImageSource="select.ico" />
+            </Button.Background>
+        </Button>
         <ListBox x:Name="listBox"
                  Width="240"
-                 Margin="0,39,20,70"
-                 HorizontalAlignment="Right"
+                 Margin="0,0,0,60"
+                 HorizontalAlignment="Left"
                  IsSynchronizedWithCurrentItem="True"
-                 ItemTemplate="{DynamicResource LogDataTemplate}"
-                 ItemsSource="{Binding LogFacility.LogMessages}" />
+                 ItemsSource="{Binding Memoirs}" />
+        <Button x:Name="button3"
+                Width="40"
+                Height="40"
+                Margin="180,0,0,10"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Bottom"
+                Click="button2_Click">
+            <Button.Background>
+                <ImageBrush ImageSource="record.ico" />
+            </Button.Background>
+        </Button>
     </Grid>
     <Window.Resources>
-        <AlternationConverter x:Key="BackgroundSeverityConverter">
-            <SolidColorBrush>Green</SolidColorBrush>
-            <SolidColorBrush>Yellow</SolidColorBrush>
-            <SolidColorBrush>Red</SolidColorBrush>
-        </AlternationConverter>
-        <Style TargetType="{x:Type ListBoxItem}">
-            <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Severity, Converter={StaticResource BackgroundSeverityConverter}}" />
-        </Style>
-        <DataTemplate x:Key="LogDataTemplate">
-            <TextBlock x:Name="logItemTextBlock"
-                       Width="Auto"
-                       Height="Auto"
-                       Text="{Binding Msg}" />
+        <DataTemplate DataType="{x:Type user:Memoir}">
+            <StackPanel Margin="3" Background="LightGray">
+                <DockPanel>
+                    <TextBlock Text="Дата изменения: " />
+                    <TextBlock Margin="5,0,10,0"
+                               DockPanel.Dock="Left"
+                               FontWeight="Bold"
+                               Foreground="Green"
+                               Text="{Binding MEMOIR_DATE_CHANGE}" />
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock Text="Текст: " />
+                    <TextBlock Margin="5,0,10,0"
+                               DockPanel.Dock="Left"
+                               FontWeight="Bold"
+                               Foreground="Blue"
+                               Text="{Binding MEMOIR_TEXT}" />
+                </DockPanel>
+            </StackPanel>
         </DataTemplate>
     </Window.Resources>
 </Window>

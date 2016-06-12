@@ -515,26 +515,26 @@ namespace PrivateMemoirsClient
         /// <summary>
         /// Same as SendResponse but the difference is it will send your specific command to the other side
         /// </summary>
-        public bool SendMessage(int cmd)
+        public bool SendPacket(int cmd)
         {
             // cmd is type of eTcpCommands
-            return SendMessage(cmd, new byte[0]);
+            return SendPacket(cmd, new byte[0]);
         }
 
         /// <summary>
         /// Same as SendResponse but the difference is it will send your specific command to the other side
         /// </summary>
         /// <param name="content">ONLY ENGLISH (ASCII)</param>
-        public bool SendMessage(int cmd, string content)
+        public bool SendPacket(int cmd, string content)
         {
-            return SendMessage(cmd, System.Text.Encoding.Unicode.GetBytes(content));
+            return SendPacket(cmd, System.Text.Encoding.Unicode.GetBytes(content));
         }
 
         /// <summary>
         /// Same as SendResponse but the difference is it will send your specific command to the other side
         /// </summary>
         /// <param name="content">ONLY ENGLISH (ASCII)</param>
-        public bool SendMessage(int cmd, byte[] content)
+        public bool SendPacket(int cmd, byte[] content)
         {
             // cmd is type of eTcpCommand
             if (IsFaulty)
@@ -553,7 +553,7 @@ namespace PrivateMemoirsClient
                     {
                         packet.Content = new byte[Marshal.SizeOf(packet)];
                         if (content.Length > packet.Content.Length)
-                            throw new Exception("AgentRelay::SendMessage->Invalid content length!");
+                            throw new Exception("AgentRelay::SendPacket->Invalid content length!");
                         for (int i = 0; i < content.Length; i++)
                             packet.Content[i] = content[i];
                         packet.DataLength = (ushort)content.Length;

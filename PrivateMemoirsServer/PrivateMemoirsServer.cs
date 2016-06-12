@@ -3,41 +3,43 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using static PrivateMemoirEnum.PrivateMemoirEnum;
+using static PrivateMemoirs.General;
 
 namespace PrivateMemoirs
 {
     public class PrivateMemoirsServer
     {
-        private Model context;
-
         private short listeningPort;
         private string listeningIPAddress;
         private string msSqlIp;
+        private string loginMsSql;
+        private string passMsSql;
+        private string dbName;
+        private Model context;
         private SHA256Cng sha256;
         private ServerRelay server;
         private ConcurrentDictionary<Guid, User> dictionaryAgents;
-        
-        public PrivateMemoirsServer()
-            : this("127.0.0.1", "127.0.0.1")
-        {
-        }
-        public PrivateMemoirsServer(string sqlServerNameOrAddress, string listenerlocalAddress)
-            : this(sqlServerNameOrAddress, listenerlocalAddress, 8877)
-        {
-        }
-        public PrivateMemoirsServer(string msSqlHostNameOrAddress, string listeningIPAddress, short listeningPort)
+
+        public delegate void NewAgentСonnectedHandler(string conAgent);
+        public event NewAgentСonnectedHandler NewAgentСonnected;
+        public delegate void AgentDisconnectedHandler(string disAgent);
+        public event AgentDisconnectedHandler AgentDisconnected;
+
+        public PrivateMemoirsServer(string msSqlHostNameOrAddress, string listeningIPAddress, short listeningPort,
+            string loginMsSql, string passMsSql, string dbName)
         {
             this.listeningIPAddress = listeningIPAddress;
             this.listeningPort = listeningPort;
             this.msSqlIp = System.Net.Dns.GetHostAddresses(msSqlHostNameOrAddress).First().ToString();
+            this.loginMsSql = loginMsSql;
+            this.passMsSql = passMsSql;
+            this.dbName = dbName;
         }
 
         public void Start()
         {
             dictionaryAgents = new ConcurrentDictionary<Guid, User>();
-            context = new Model("data source=" + msSqlIp +
-                "\\SQLEXPRESS;initial catalog=MEMOIRS_DB;persist security info=True;user id=PrivateNotes;password=PrivateNotes;MultipleActiveResultSets=True;App=EntityFramework");
+            context = new Model($"data source={msSqlIp}\\SQLEXPRESS;initial catalog={dbName};persist security info=True;user id={loginMsSql};password={passMsSql};MultipleActiveResultSets=True;App=EntityFramework");
 
             server = new ServerRelay(true);
             server.StartServer(listeningIPAddress, listeningPort);
@@ -72,7 +74,10 @@ namespace PrivateMemoirs
                                 Login = _login
                             };
                         }
-                        listener.SendMessage((byte)TcpCommands.ServerHello);
+                        NewAgentСonnected("New Agent Сonnected! GUID -> " + listener.Guid
+                            + ", User login -> " + dictionaryAgents[listener.Guid].Login
+                            + ", Date -> " + DateTime.Now);
+                        listener.SendPacket((byte)TcpCommands.ServerHello);
                     }
                     break;
 
@@ -83,44 +88,42 @@ namespace PrivateMemoirs
                         if (dictionaryAgents[listener.Guid].Hash == hash)
                         {
                             dictionaryAgents[listener.Guid].Verified = true;
-                            listener.SendMessage((byte)TcpCommands.ServerLoginOK);
+                            listener.SendPacket((byte)TcpCommands.ServerLoginOK);
                             return;
                         }
                         else
                         {
-                            listener.SendMessage((byte)TcpCommands.ServerLoginFailed, "Неправильный пароль.");
+                            listener.SendPacket((byte)TcpCommands.ServerLoginFailed, "Неправильный пароль.");
                             return;
                         }
                     }
-                    listener.SendMessage((byte)TcpCommands.ServerLoginFailed, "Такой пользователь не зарегистрирован.");
+                    listener.SendPacket((byte)TcpCommands.ServerLoginFailed, "Такой пользователь не зарегистрирован.");
                     break;
 
                 case (byte)TcpCommands.ClientGetDataQuery:
                     if (dictionaryAgents[listener.Guid].Verified)
                     {
+                        int counter = -1;
                         foreach (var memoir in dictionaryAgents[listener.Guid].Content.MEMOIRS)
                         {
-                            listener.SendMessage((byte)TcpCommands.ServerGetDataResponse, memoir.MEMOIR_TITLE);
-                            listener.SendMessage((byte)TcpCommands.ServerGetDataResponse,
-                                string.Format("{0:HH:mm:ss d.M.yyyy}", memoir.MEMOIR_DATE_CHANGE));
-                            listener.SendMessage((byte)TcpCommands.ServerGetDataResponse, memoir.MEMOIR_TEXT);
+                            listener.SendPacket((byte)TcpCommands.ServerGetDataMarkMemoirResponse, counter.ToString());
+                            listener.SendPacket((byte)TcpCommands.ServerGetDataMarkResponse, new byte[] { (byte)CurrentMemoirField.MEMOIR_DATE_CHANGE });
+                            listener.SendPacket((byte)TcpCommands.ServerGetDataResponse, memoir.MEMOIR_DATE_CHANGE.ToString());
+                            listener.SendPacket((byte)TcpCommands.ServerGetDataMarkResponse, new byte[] { (byte)CurrentMemoirField.MEMOIR_TEXT });
+                            listener.SendPacket((byte)TcpCommands.ServerGetDataResponse, memoir.MEMOIR_TEXT);
+                            counter++;
                         }
-                        listener.SendMessage((byte)TcpCommands.ServerOK);
+                        listener.SendPacket((byte)TcpCommands.ServerOK);
                         return;
                     }
-                    listener.SendMessage((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");
                     break;
 
                 case (byte)TcpCommands.ClientMarkFieldQuery:
                     if (dictionaryAgents[listener.Guid].Verified)
                     {
-                        byte mark = Convert.ToByte(AgentRelay.MakeStringFromPacketContents(packet));
+                        byte mark = packet.Content[0];
                         switch (mark)
                         {
-                            case (byte)CurrentMemoirField.MEMOIR_TITLE:
-                                dictionaryAgents[listener.Guid].CurrentField = CurrentMemoirField.MEMOIR_TITLE;
-                                break;
-
                             case (byte)CurrentMemoirField.MEMOIR_TEXT:
                                 dictionaryAgents[listener.Guid].CurrentField = CurrentMemoirField.MEMOIR_TEXT;
                                 break;
@@ -129,25 +132,23 @@ namespace PrivateMemoirs
                                 dictionaryAgents[listener.Guid].CurrentField = CurrentMemoirField.MEMOIR_DATE_CHANGE;
                                 break;
                         }
-                        listener.SendMessage((byte)TcpCommands.ServerOK);
+                        listener.SendPacket((byte)TcpCommands.ServerOK);
                         return;
                     }
-                    listener.SendMessage((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");
                     break;
 
                 case (byte)TcpCommands.ClientMarkMemoirQuery:
                     if (dictionaryAgents[listener.Guid].Verified)
                     {
-                        int mark = Convert.ToInt32(AgentRelay.MakeStringFromPacketContents(packet));
+                        int curMemoir = Convert.ToInt32(AgentRelay.MakeStringFromPacketContents(packet));
                         if (dictionaryAgents[listener.Guid].CurentMemoir > dictionaryAgents[listener.Guid].Content.MEMOIRS.Count)
                         {
                             dictionaryAgents[listener.Guid].Content.MEMOIRS.Add(new MEMOIRS());
                         }
-                        dictionaryAgents[listener.Guid].CurentMemoir = mark;
-                        listener.SendMessage((byte)TcpCommands.ServerOK);
+                        dictionaryAgents[listener.Guid].CurentMemoir = curMemoir;
+                        listener.SendPacket((byte)TcpCommands.ServerOK);
                         return;
                     }
-                    listener.SendMessage((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");
                     break;
 
                 case (byte)TcpCommands.ClientAddDataQuery:
@@ -158,10 +159,6 @@ namespace PrivateMemoirs
                         
                         switch (dictionaryAgents[listener.Guid].CurrentField)
                         {
-                            case CurrentMemoirField.MEMOIR_TITLE:
-                                memoir.MEMOIR_TITLE = content;
-                                break;
-
                             case CurrentMemoirField.MEMOIR_TEXT:
                                 memoir.MEMOIR_TEXT = content;
                                 break;
@@ -172,10 +169,9 @@ namespace PrivateMemoirs
                         }
                         context.MEMOIRS.Add(memoir);
                         context.SaveChanges();
-                        listener.SendMessage((byte)TcpCommands.ServerOK);
+                        listener.SendPacket((byte)TcpCommands.ServerOK);
                         return;
                     }
-                    listener.SendMessage((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");
                     break;
 
                 case (byte)TcpCommands.ClientUpdateDataQuery:
@@ -186,10 +182,6 @@ namespace PrivateMemoirs
 
                         switch (dictionaryAgents[listener.Guid].CurrentField)
                         {
-                            case CurrentMemoirField.MEMOIR_TITLE:
-                                memoir.MEMOIR_TITLE = content;
-                                break;
-
                             case CurrentMemoirField.MEMOIR_TEXT:
                                 memoir.MEMOIR_TEXT = content;
                                 break;
@@ -200,10 +192,10 @@ namespace PrivateMemoirs
                         }
                         
                         context.SaveChanges();
-                        listener.SendMessage((byte)TcpCommands.ServerOK);
+                        listener.SendPacket((byte)TcpCommands.ServerOK);
                         return;
                     }
-                    listener.SendMessage((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");
+                    listener.SendPacket((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");
                     break;
 
                 case (byte)TcpCommands.ClientDeleteDataQuery:
@@ -215,23 +207,23 @@ namespace PrivateMemoirs
 
                         if (memoir.Count() == 0)
                         {
-                            listener.SendMessage((byte)TcpCommands.ServerFailed, "Такая запись не существует.");
+                            listener.SendPacket((byte)TcpCommands.ServerFailed, "Такая запись не существует.");
                             return;
                         }
 
                         context.MEMOIRS.Remove(memoir.First());
                         context.SaveChanges();
-                        listener.SendMessage((byte)TcpCommands.ServerOK);
+                        listener.SendPacket((byte)TcpCommands.ServerOK);
                         return;
                     }
-                    listener.SendMessage((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");
+                    listener.SendPacket((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");
                     break;
 
                 case (byte)TcpCommands.ClientRegistrationQuery:
                     string login = dictionaryAgents[listener.Guid].Login;
                     if (context.USERS.ToList().Exists(u => u.USER_LOGIN == login))
                     {
-                        listener.SendMessage((byte)TcpCommands.ServerRegistrationFailed, "Такой пользователь уже зарегестрирован.");
+                        listener.SendPacket((byte)TcpCommands.ServerRegistrationFailed, "Такой пользователь уже зарегестрирован.");
                         return;
                     }
 
@@ -239,12 +231,13 @@ namespace PrivateMemoirs
                         USER_HASH = GetHash(AgentRelay.MakeStringFromPacketContents(packet)),
                         REGISTRATION_DATE = DateTime.Now, USER_GUID = Guid.NewGuid() });
                     context.SaveChanges();
-                    listener.SendMessage((byte)TcpCommands.ServerRegistrationOK);
+                    listener.SendPacket((byte)TcpCommands.ServerRegistrationOK);
                     break;
 
                 case (byte)TcpCommands.ClientBye:
-                    listener.SendMessage((byte)TcpCommands.ServerBye);
-                    listener.Disconnect();
+                    AgentDisconnected("Agent Disconnected! GUID -> " + listener.Guid
+                            + ", User login -> " + dictionaryAgents[listener.Guid].Login
+                            + ", Date -> " + DateTime.Now);
                     break;
             }
         }
