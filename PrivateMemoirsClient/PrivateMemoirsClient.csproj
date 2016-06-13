@@ -144,7 +144,7 @@
     <Resource Include="record.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="select.ico" />
+    <Resource Include="add.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

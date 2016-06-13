@@ -1,21 +1,9 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.Collections.Generic;
-using System.Linq;
-using System.Globalization;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Threading;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using PrivateMemoirsUser;
+using DialogManagement;
 using static PrivateMemoirs.General;
 
 
@@ -23,9 +11,11 @@ namespace PrivateMemoirsClient
 {
     public partial class MainWindow : Window
     {
-        private AgentRelay agent;
         private string userLogin;
+        private bool close = false;
+        private AgentRelay agent;
         private User user;
+        private Message message;
 
         public MainWindow(AgentRelay agent, string userLogin)
         {
@@ -36,6 +26,27 @@ namespace PrivateMemoirsClient
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            if (!close)
+            {
+                e.Cancel = true;
+
+                var mes1 = new Message("Предупреждение", "Вы действительно хотите выйти?");
+                mes1.CreateQuestioningDialog(new DialogManager(this, Dispatcher), () =>
+                {
+                    mes1.Close();
+                    var mes2 = new Message("Предупреждение", "Сохранить воспаминания?");
+                    mes2.CreateQuestioningDialog(new DialogManager(this, Dispatcher), () =>
+                    {
+                        Record();
+                        close = true;
+                        Close();
+                    }, () =>
+                    {
+                        close = true;
+                        Close();
+                    });
+                }, () => { return; });
+            }
             agent.SendPacket((byte)TcpCommands.ClientBye);
             agent.Disconnect();
             agent.Dispose();
@@ -71,9 +82,6 @@ namespace PrivateMemoirsClient
             {
                 switch (packet.Command)
                 {
-                    case (byte)TcpCommands.ServerOK:
-                        break;
-
                     case (byte)TcpCommands.ServerGetDataMarkResponse:
                         byte mark = packet.Content[0];
                         Dispatcher.BeginInvoke(new Action(() =>
@@ -86,6 +94,10 @@ namespace PrivateMemoirsClient
 
                                 case (byte)CurrentMemoirField.MEMOIR_DATE_CHANGE:
                                     user.CurrentField = CurrentMemoirField.MEMOIR_DATE_CHANGE;
+                                    break;
+
+                                case (byte)CurrentMemoirField.MEMOIR_ID:
+                                    user.CurrentField = CurrentMemoirField.MEMOIR_ID;
                                     break;
                             }
                         }));
@@ -116,27 +128,96 @@ namespace PrivateMemoirsClient
                                 case CurrentMemoirField.MEMOIR_DATE_CHANGE:
                                     user.Memoirs[user.CurentMemoir].MEMOIR_DATE_CHANGE = content;
                                     break;
+
+                                case CurrentMemoirField.MEMOIR_ID:
+                                    user.Memoirs[user.CurentMemoir].MEMOIR_ID = content;
+                                    break;
+                            }
+                        }));
+                        break;
+
+                    case (byte)TcpCommands.ServerFailed:
+                        Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            if (message != null)
+                            {
+                                message.Close();
+                                var mes = new Message("Ошибка", AgentRelay.MakeStringFromPacketContents(packet));
+                                mes.CreateMessageDialog(new DialogManager(this, Dispatcher));
+                                buttonRecord.IsEnabled = true;
+                            }
+                        }));
+                        break;
+                    case (byte)TcpCommands.ServerOK:
+                        Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            if (message != null)
+                            {
+                                message.Close();
+                                var mes = new Message("Успешно", AgentRelay.MakeStringFromPacketContents(packet));
+                                mes.CreateMessageDialog(new DialogManager(this, Dispatcher));
+                                buttonRecord.IsEnabled = true;
                             }
                         }));
                         break;
                 }
             }
-            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            catch (Exception ex)
+            {
+                var mes = new Message("Ошибка", ex.Message);
+                mes.CreateMessageDialog(new DialogManager(this, Dispatcher));
+            }
         }
 
-        private void button1_Click(object sender, RoutedEventArgs e)
+        private void buttonAdd_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(user.Memoirs.Last().MEMOIR_TEXT);
+            user.Memoirs.Add(new Memoir() { MEMOIR_DATE_CHANGE = DateTime.Now.ToString(), MEMOIR_TEXT = "" });
+            user.CurentMemoir++;
+            agent.SendPacket((byte)TcpCommands.ClientMarkMemoirQuery, user.CurentMemoir.ToString());
+            listBox.SelectedIndex = user.Memoirs.Count - 1;
         }
 
-        private void button2_Click(object sender, RoutedEventArgs e)
+        private void buttonRecord_Click(object sender, RoutedEventArgs e)
         {
-
+            Record();
         }
 
-        private void button4_Click(object sender, RoutedEventArgs e)
+        private void Record()
         {
+            buttonRecord.IsEnabled = false;
 
+            message = new Message("Соеднинение с сервером...", "Подождите, пожалуйста," +
+            Environment.NewLine + "пока идет запись данных.");
+            message.CreateWaitDialog(new DialogManager(this, Dispatcher),
+            () =>
+            {
+                //agent.SendPacket((byte)TcpCommands
+            });
+        }
+
+        private void buttonDelete_Click(object sender, RoutedEventArgs e)
+        {
+            int sel = listBox.SelectedIndex;
+
+            if (sel == -1)
+            {
+                var mes1 = new Message("Ошибка", "Для удаления, выделите сначала воспаминание.");
+                mes1.CreateMessageDialog(new DialogManager(this, Dispatcher));
+                return;
+            }
+
+            var mes2 = new Message("Предупреждение", "Вы действительно хотите удалить воспаминание?");
+            mes2.CreateQuestioningDialog(new DialogManager(this, Dispatcher), () =>
+            {
+                agent.SendPacket((byte)TcpCommands.ClientDeleteDataQuery, user.Memoirs[sel].MEMOIR_ID);
+                user.CurentMemoir--;
+                agent.SendPacket((byte)TcpCommands.ClientMarkMemoirQuery, user.CurentMemoir.ToString());
+                user.Memoirs.RemoveAt(sel);
+            }, () =>
+            {
+                return;
+            }
+            );
         }
     }
 }

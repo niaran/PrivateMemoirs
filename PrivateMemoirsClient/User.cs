@@ -17,6 +17,7 @@ namespace PrivateMemoirsUser
 
         private string text;
         private string date;
+        private string id;
 
         public string MEMOIR_TEXT
         {
@@ -27,6 +28,11 @@ namespace PrivateMemoirsUser
         {
             get { return date; }
             set { date = value; RaisePropertyChanged("MEMOIR_DATE_CHANGE"); }
+        }
+        public string MEMOIR_ID
+        {
+            get { return id; }
+            set { id = value; }
         }
 
         protected virtual void RaisePropertyChanged(PropertyChangedEventArgs e)

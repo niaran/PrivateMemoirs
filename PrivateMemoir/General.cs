@@ -10,7 +10,8 @@ namespace PrivateMemoirs
         {
             NONE = 0,
             MEMOIR_TEXT = 1,
-            MEMOIR_DATE_CHANGE = 2
+            MEMOIR_DATE_CHANGE = 2,
+            MEMOIR_ID = 3
         }
 
         public enum TcpCommands : byte
@@ -75,6 +76,16 @@ namespace PrivateMemoirs
                 var messageDialog = dialogManager.CreateMessageDialog(_message, _caption, DialogMode.Ok);
                 if (workerReady != null)
                     messageDialog.Ok += workerReady;
+                _dialogManager = messageDialog;
+                messageDialog.Show();
+            }
+
+            public void CreateQuestioningDialog(IDialogManager dialogManager, Action workerYes, Action workerNo = null)
+            {
+                var messageDialog = dialogManager.CreateMessageDialog(_message, _caption, DialogMode.YesNo);
+                messageDialog.Yes += workerYes;
+                if (workerNo != null)
+                    messageDialog.No += workerNo;
                 _dialogManager = messageDialog;
                 messageDialog.Show();
             }

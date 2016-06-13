@@ -111,11 +111,14 @@ namespace PrivateMemoirs
                             listener.SendPacket((byte)TcpCommands.ServerGetDataResponse, memoir.MEMOIR_DATE_CHANGE.ToString());
                             listener.SendPacket((byte)TcpCommands.ServerGetDataMarkResponse, new byte[] { (byte)CurrentMemoirField.MEMOIR_TEXT });
                             listener.SendPacket((byte)TcpCommands.ServerGetDataResponse, memoir.MEMOIR_TEXT);
+                            listener.SendPacket((byte)TcpCommands.ServerGetDataMarkResponse, new byte[] { (byte)CurrentMemoirField.MEMOIR_ID });
+                            listener.SendPacket((byte)TcpCommands.ServerGetDataResponse, memoir.MEMOIR_ID.ToString());
                             counter++;
                         }
                         listener.SendPacket((byte)TcpCommands.ServerOK);
                         return;
                     }
+                    listener.SendPacket((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");
                     break;
 
                 case (byte)TcpCommands.ClientMarkFieldQuery:
@@ -135,13 +138,14 @@ namespace PrivateMemoirs
                         listener.SendPacket((byte)TcpCommands.ServerOK);
                         return;
                     }
+                    listener.SendPacket((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");
                     break;
 
                 case (byte)TcpCommands.ClientMarkMemoirQuery:
                     if (dictionaryAgents[listener.Guid].Verified)
                     {
                         int curMemoir = Convert.ToInt32(AgentRelay.MakeStringFromPacketContents(packet));
-                        if (dictionaryAgents[listener.Guid].CurentMemoir > dictionaryAgents[listener.Guid].Content.MEMOIRS.Count)
+                        if (dictionaryAgents[listener.Guid].CurentMemoir < curMemoir)
                         {
                             dictionaryAgents[listener.Guid].Content.MEMOIRS.Add(new MEMOIRS());
                         }
@@ -149,6 +153,7 @@ namespace PrivateMemoirs
                         listener.SendPacket((byte)TcpCommands.ServerOK);
                         return;
                     }
+                    listener.SendPacket((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");
                     break;
 
                 case (byte)TcpCommands.ClientAddDataQuery:
@@ -166,12 +171,17 @@ namespace PrivateMemoirs
                             case CurrentMemoirField.MEMOIR_DATE_CHANGE:
                                 memoir.MEMOIR_DATE_CHANGE = Convert.ToDateTime(content);
                                 break;
+
+                            case CurrentMemoirField.MEMOIR_ID:
+                                memoir.MEMOIR_ID = Convert.ToInt64(content);
+                                break;
                         }
                         context.MEMOIRS.Add(memoir);
                         context.SaveChanges();
                         listener.SendPacket((byte)TcpCommands.ServerOK);
                         return;
                     }
+                    listener.SendPacket((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");
                     break;
 
                 case (byte)TcpCommands.ClientUpdateDataQuery:
@@ -188,6 +198,10 @@ namespace PrivateMemoirs
 
                             case CurrentMemoirField.MEMOIR_DATE_CHANGE:
                                 memoir.MEMOIR_DATE_CHANGE = Convert.ToDateTime(content);
+                                break;
+
+                            case CurrentMemoirField.MEMOIR_ID:
+                                memoir.MEMOIR_ID = Convert.ToInt64(content);
                                 break;
                         }
                         
@@ -210,10 +224,10 @@ namespace PrivateMemoirs
                             listener.SendPacket((byte)TcpCommands.ServerFailed, "Такая запись не существует.");
                             return;
                         }
-
+                        
                         context.MEMOIRS.Remove(memoir.First());
                         context.SaveChanges();
-                        listener.SendPacket((byte)TcpCommands.ServerOK);
+                        listener.SendPacket((byte)TcpCommands.ServerOK, "Воспаминание удаленно.");
                         return;
                     }
                     listener.SendPacket((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");

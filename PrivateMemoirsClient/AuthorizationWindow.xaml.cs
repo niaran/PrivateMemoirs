@@ -15,6 +15,7 @@ namespace PrivateMemoirsClient
         private AgentRelay agent;
         private Message message;
         private Thread serverResponseTimeout;
+        private bool disconnect = true;
 
         public AuthorizationWindow()
         {
@@ -35,6 +36,12 @@ namespace PrivateMemoirsClient
             {
                 message.Close();
                 message = null;
+            }
+            if (disconnect)
+            {
+                agent.SendPacket((byte)TcpCommands.ClientBye);
+                agent.Disconnect();
+                agent.Dispose();
             }
         }
 
@@ -58,6 +65,7 @@ namespace PrivateMemoirsClient
                     {
                         var mainWindow = new MainWindow(agent, textBoxLogin1.Text);
                         message.Close();
+                        disconnect = false;
                         Close();
                         mainWindow.Show();
                     }));

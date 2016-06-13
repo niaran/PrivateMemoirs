@@ -32,26 +32,26 @@
                              Text="{Binding SelectedItem.MEMOIR_TEXT,
                                             ElementName=listBox,
                                             Mode=TwoWay}" />
-        <Button x:Name="button1"
+        <Button x:Name="buttonDelete"
                 Width="40"
                 Height="40"
                 Margin="20,0,0,10"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Bottom"
-                Click="button1_Click">
+                Click="buttonDelete_Click">
             <Button.Background>
                 <ImageBrush ImageSource="delete.ico" />
             </Button.Background>
         </Button>
-        <Button x:Name="button2"
+        <Button x:Name="buttonAdd"
                 Width="40"
                 Height="40"
                 Margin="100,0,0,10"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Bottom"
-                Click="button2_Click">
+                Click="buttonAdd_Click">
             <Button.Background>
-                <ImageBrush ImageSource="select.ico" />
+                <ImageBrush ImageSource="add.ico" />
             </Button.Background>
         </Button>
         <ListBox x:Name="listBox"
@@ -60,13 +60,13 @@
                  HorizontalAlignment="Left"
                  IsSynchronizedWithCurrentItem="True"
                  ItemsSource="{Binding Memoirs}" />
-        <Button x:Name="button3"
+        <Button x:Name="buttonRecord"
                 Width="40"
                 Height="40"
                 Margin="180,0,0,10"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Bottom"
-                Click="button2_Click">
+                Click="buttonRecord_Click">
             <Button.Background>
                 <ImageBrush ImageSource="record.ico" />
             </Button.Background>
