@@ -25,6 +25,8 @@ namespace PrivateMemoirs
         public event NewAgentСonnectedHandler NewAgentСonnected;
         public delegate void AgentDisconnectedHandler(string disAgent);
         public event AgentDisconnectedHandler AgentDisconnected;
+        public delegate void PackageHandler(TcpCommands com, string cont);
+        public event PackageHandler PackageOn;
 
         public PrivateMemoirsServer(string msSqlHostNameOrAddress, string listeningIPAddress, short listeningPort,
             string loginMsSql, string passMsSql, string dbName)
@@ -51,6 +53,7 @@ namespace PrivateMemoirs
 
         private void Listener_OnNewPacketReceived(AgentRelay.Packet packet, AgentRelay listener)
         {
+            PackageOn((TcpCommands)packet.Command, AgentRelay.MakeStringFromPacketContents(packet));
             switch (packet.Command)
             {
                 case (byte)TcpCommands.ClientHello:

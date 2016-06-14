@@ -19,6 +19,8 @@ namespace PrivateMemoirs
                         options.passMsSql, options.dbName);
                     memoirsServer.NewAgentСonnected += MemoirsServer_NewAgentСonnected;
                     memoirsServer.AgentDisconnected += MemoirsServer_AgentDisconnected;
+                    memoirsServer.PackageOn += MemoirsServer_PackageOn;
+                    ;
                     Console.CancelKeyPress += delegate
                     {
                         Console.WriteLine("Private Memoirs Server has stopping...");
@@ -32,6 +34,11 @@ namespace PrivateMemoirs
             {
                 Environment.Exit(1);
             }
+        }
+
+        private static void MemoirsServer_PackageOn(General.TcpCommands com, string cont)
+        {
+            Console.WriteLine("Команда -> " + com + ", Содержимое ->" + cont);
         }
 
         private static void MemoirsServer_AgentDisconnected(string disAgent)

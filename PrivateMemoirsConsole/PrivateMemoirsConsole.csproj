@@ -74,6 +74,10 @@
       <Project>{4bb5ab85-e178-460d-887a-7769cfe41187}</Project>
       <Name>PrivateMemoirsServer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PrivateMemoir\PrivateMemoirs.csproj">
+      <Project>{5f14ddb1-0cd0-4158-a1be-5de2059f115b}</Project>
+      <Name>PrivateMemoirs</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="console.ico" />

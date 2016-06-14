@@ -93,7 +93,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Client.ico" />
-    <Content Include="NDP461-KB3102436-x86-x64-AllOS-ENU.exe" />
     <Content Include="service.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
