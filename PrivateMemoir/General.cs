@@ -11,7 +11,8 @@ namespace PrivateMemoirs
             NONE = 0,
             MEMOIR_TEXT = 1,
             MEMOIR_DATE_CHANGE = 2,
-            MEMOIR_ID = 3
+            MEMOIR_ID = 3,
+            MEMOIR_TITLE = 4
         }
 
         public enum TcpCommands : byte
@@ -33,10 +34,12 @@ namespace PrivateMemoirs
             ClientLoginQuery = 20,
             ClientGetDataQuery = 30,
             ClientMarkFieldQuery = 40,
-            ClientMarkMemoirQuery = 50,
-            ClientAddDataQuery = 60,
+            ClientMarkTotalMemoirQuery = 50,
+            ClientMarkCurrentMemoirQuery = 55,
+            ClientUpdateEndQuery = 60,
             ClientUpdateDataQuery = 70,
-            ClientDeleteDataQuery = 80
+            ClientDeleteDataQuery = 80,
+            ClientDeleteDataLastQuery = 90
         };
 
         public class Message

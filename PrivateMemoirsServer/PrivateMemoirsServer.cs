@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -47,7 +48,7 @@ namespace PrivateMemoirs
             server.OnNewAgentConnected += Server_OnNewAgentConnected;
             sha256 = new SHA256Cng();
         }
-        
+
         private void Listener_OnNewPacketReceived(AgentRelay.Packet packet, AgentRelay listener)
         {
             switch (packet.Command)
@@ -64,14 +65,18 @@ namespace PrivateMemoirs
                             {
                                 Login = _user.USER_LOGIN,
                                 Hash = _user.USER_HASH,
-                                Content = _user
+                                Content = _user,
+                                CurrentMemoir = 0,
+                                TotalMemoir = _user.MEMOIRS.Count - 1
                             };
                         }
                         else
                         {
                             dictionaryAgents[listener.Guid] = new User
                             {
-                                Login = _login
+                                Login = _login,
+                                CurrentMemoir = 0,
+                                TotalMemoir = 0
                             };
                         }
                         NewAgentСonnected("New Agent Сonnected! GUID -> " + listener.Guid
@@ -103,7 +108,7 @@ namespace PrivateMemoirs
                 case (byte)TcpCommands.ClientGetDataQuery:
                     if (dictionaryAgents[listener.Guid].Verified)
                     {
-                        int counter = -1;
+                        int counter = 0;
                         foreach (var memoir in dictionaryAgents[listener.Guid].Content.MEMOIRS)
                         {
                             listener.SendPacket((byte)TcpCommands.ServerGetDataMarkMemoirResponse, counter.ToString());
@@ -113,6 +118,8 @@ namespace PrivateMemoirs
                             listener.SendPacket((byte)TcpCommands.ServerGetDataResponse, memoir.MEMOIR_TEXT);
                             listener.SendPacket((byte)TcpCommands.ServerGetDataMarkResponse, new byte[] { (byte)CurrentMemoirField.MEMOIR_ID });
                             listener.SendPacket((byte)TcpCommands.ServerGetDataResponse, memoir.MEMOIR_ID.ToString());
+                            listener.SendPacket((byte)TcpCommands.ServerGetDataMarkResponse, new byte[] { (byte)CurrentMemoirField.MEMOIR_TITLE });
+                            listener.SendPacket((byte)TcpCommands.ServerGetDataResponse, memoir.MEMOIR_TITLE);
                             counter++;
                         }
                         listener.SendPacket((byte)TcpCommands.ServerOK);
@@ -134,52 +141,54 @@ namespace PrivateMemoirs
                             case (byte)CurrentMemoirField.MEMOIR_DATE_CHANGE:
                                 dictionaryAgents[listener.Guid].CurrentField = CurrentMemoirField.MEMOIR_DATE_CHANGE;
                                 break;
+
+                            case (byte)CurrentMemoirField.MEMOIR_ID:
+                                dictionaryAgents[listener.Guid].CurrentField = CurrentMemoirField.MEMOIR_ID;
+                                break;
+
+                            case (byte)CurrentMemoirField.MEMOIR_TITLE:
+                                dictionaryAgents[listener.Guid].CurrentField = CurrentMemoirField.MEMOIR_TITLE;
+                                break;
                         }
-                        listener.SendPacket((byte)TcpCommands.ServerOK);
                         return;
                     }
                     listener.SendPacket((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");
                     break;
 
-                case (byte)TcpCommands.ClientMarkMemoirQuery:
+                case (byte)TcpCommands.ClientMarkTotalMemoirQuery:
                     if (dictionaryAgents[listener.Guid].Verified)
                     {
-                        int curMemoir = Convert.ToInt32(AgentRelay.MakeStringFromPacketContents(packet));
-                        if (dictionaryAgents[listener.Guid].CurentMemoir < curMemoir)
+                        int total = Convert.ToInt32(AgentRelay.MakeStringFromPacketContents(packet));
+                        if (dictionaryAgents[listener.Guid].TotalMemoir < total)
                         {
-                            dictionaryAgents[listener.Guid].Content.MEMOIRS.Add(new MEMOIRS());
+                            dictionaryAgents[listener.Guid].Content.MEMOIRS.Add(new MEMOIRS() { MEMOIR_DATE_RECORD = DateTime.Now });
+                            dictionaryAgents[listener.Guid].TotalMemoir++;
                         }
-                        dictionaryAgents[listener.Guid].CurentMemoir = curMemoir;
-                        listener.SendPacket((byte)TcpCommands.ServerOK);
                         return;
                     }
                     listener.SendPacket((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");
                     break;
 
-                case (byte)TcpCommands.ClientAddDataQuery:
+                case (byte)TcpCommands.ClientMarkCurrentMemoirQuery:
                     if (dictionaryAgents[listener.Guid].Verified)
                     {
-                        string content = AgentRelay.MakeStringFromPacketContents(packet);
-                        var memoir = dictionaryAgents[listener.Guid].Content.MEMOIRS.Last();
-                        
-                        switch (dictionaryAgents[listener.Guid].CurrentField)
-                        {
-                            case CurrentMemoirField.MEMOIR_TEXT:
-                                memoir.MEMOIR_TEXT = content;
-                                break;
-
-                            case CurrentMemoirField.MEMOIR_DATE_CHANGE:
-                                memoir.MEMOIR_DATE_CHANGE = Convert.ToDateTime(content);
-                                break;
-
-                            case CurrentMemoirField.MEMOIR_ID:
-                                memoir.MEMOIR_ID = Convert.ToInt64(content);
-                                break;
-                        }
-                        context.MEMOIRS.Add(memoir);
-                        context.SaveChanges();
-                        listener.SendPacket((byte)TcpCommands.ServerOK);
+                        int current = Convert.ToInt32(AgentRelay.MakeStringFromPacketContents(packet));
+                        dictionaryAgents[listener.Guid].CurrentMemoir = current;
                         return;
+                    }
+                    listener.SendPacket((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");
+                    break;
+
+                case (byte)TcpCommands.ClientUpdateEndQuery:
+                    if (dictionaryAgents[listener.Guid].Verified)
+                    {
+                        try
+                        {
+                            context.SaveChanges();
+                            listener.SendPacket((byte)TcpCommands.ServerOK, "Данные записаны.");
+                            return;
+                        }
+                        catch (Exception ex) { }
                     }
                     listener.SendPacket((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");
                     break;
@@ -188,7 +197,8 @@ namespace PrivateMemoirs
                     if (dictionaryAgents[listener.Guid].Verified)
                     {
                         string content = AgentRelay.MakeStringFromPacketContents(packet);
-                        var memoir = context.MEMOIRS.ElementAt(dictionaryAgents[listener.Guid].CurentMemoir);
+                        var listMemoir = dictionaryAgents[listener.Guid].Content.MEMOIRS.ToList();
+                        var memoir = listMemoir[dictionaryAgents[listener.Guid].CurrentMemoir];
 
                         switch (dictionaryAgents[listener.Guid].CurrentField)
                         {
@@ -200,13 +210,10 @@ namespace PrivateMemoirs
                                 memoir.MEMOIR_DATE_CHANGE = Convert.ToDateTime(content);
                                 break;
 
-                            case CurrentMemoirField.MEMOIR_ID:
-                                memoir.MEMOIR_ID = Convert.ToInt64(content);
+                            case CurrentMemoirField.MEMOIR_TITLE:
+                                memoir.MEMOIR_TITLE = content;
                                 break;
                         }
-                        
-                        context.SaveChanges();
-                        listener.SendPacket((byte)TcpCommands.ServerOK);
                         return;
                     }
                     listener.SendPacket((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");
@@ -224,9 +231,23 @@ namespace PrivateMemoirs
                             listener.SendPacket((byte)TcpCommands.ServerFailed, "Такая запись не существует.");
                             return;
                         }
-                        
+
                         context.MEMOIRS.Remove(memoir.First());
                         context.SaveChanges();
+                        dictionaryAgents[listener.Guid].TotalMemoir--;
+                        listener.SendPacket((byte)TcpCommands.ServerOK, "Воспаминание удаленно.");
+                        return;
+                    }
+                    listener.SendPacket((byte)TcpCommands.ServerFailed, "Необходимо авторизоваться.");
+                    break;
+                case (byte)TcpCommands.ClientDeleteDataLastQuery:
+                    if (dictionaryAgents[listener.Guid].Verified)
+                    {
+                        var memoir = dictionaryAgents[listener.Guid].Content.MEMOIRS;
+
+                        context.MEMOIRS.Remove(memoir.Last());
+                        context.SaveChanges();
+                        dictionaryAgents[listener.Guid].TotalMemoir--;
                         listener.SendPacket((byte)TcpCommands.ServerOK, "Воспаминание удаленно.");
                         return;
                     }
@@ -241,9 +262,13 @@ namespace PrivateMemoirs
                         return;
                     }
 
-                    context.USERS.Add(new USERS { USER_LOGIN = login,
+                    context.USERS.Add(new USERS
+                    {
+                        USER_LOGIN = login,
                         USER_HASH = GetHash(AgentRelay.MakeStringFromPacketContents(packet)),
-                        REGISTRATION_DATE = DateTime.Now, USER_GUID = Guid.NewGuid() });
+                        REGISTRATION_DATE = DateTime.Now,
+                        USER_GUID = Guid.NewGuid()
+                    });
                     context.SaveChanges();
                     listener.SendPacket((byte)TcpCommands.ServerRegistrationOK);
                     break;
@@ -283,7 +308,8 @@ namespace PrivateMemoirs
             public bool Verified { get; set; } = false;
 
             public USERS Content { get; set; }
-            public int CurentMemoir { get; set; }
+            public int TotalMemoir { get; set; }
+            public int CurrentMemoir { get; set; }
             public CurrentMemoirField CurrentField { get; set; } = CurrentMemoirField.NONE;
         }
     }

@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="PrivateMemoirs.AgentRelay">
+    <Position X="1.25" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Delegate Name="PrivateMemoirs.AgentRelay.NewPacketReceived" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>AgentRelay.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Enum Name="PrivateMemoirs.AgentRelay.eResponseTypes" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>AgentRelay.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Class Name="PrivateMemoirs.AgentRelay.Packet" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>AgentRelay.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Enum Name="PrivateMemoirs.AgentRelay.eAsyncHandshakeResult" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>AgentRelay.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>ABUQBJAEACXAAQCAgAAAAoAOIAAAFAWpAAAAAAACCgA=</HashCode>
+      <FileName>AgentRelay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PrivateMemoirs.MEMOIRS">
+    <Position X="4.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAIAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAggBg=</HashCode>
+      <FileName>MEMOIRS.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PrivateMemoirs.Model">
+    <Position X="6.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAIAEAAAAAAAAAAAAAAAAAg=</HashCode>
+      <FileName>Model.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PrivateMemoirs.NetComm">
+    <Position X="3" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAYAABAIgChgAABAAAAAAIBIAAAACAAAAQBAECABAAQ=</HashCode>
+      <FileName>NetComm.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PrivateMemoirs.PrivateMemoirsServer">
+    <Position X="6.5" Y="0.5" Width="2.5" />
+    <NestedTypes>
+      <Delegate Name="PrivateMemoirs.PrivateMemoirsServer.NewAgentСonnectedHandler" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>PrivateMemoirsServer.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="PrivateMemoirs.PrivateMemoirsServer.AgentDisconnectedHandler" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>PrivateMemoirsServer.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Class Name="PrivateMemoirs.PrivateMemoirsServer.User" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>PrivateMemoirsServer.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>BAACAAAABCAAKAAAAAkAAQBAAAAQIAACYAAAEAAAAAI=</HashCode>
+      <FileName>PrivateMemoirsServer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PrivateMemoirs.ServerRelay">
+    <Position X="4.75" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Delegate Name="PrivateMemoirs.ServerRelay.NewAgentConnected" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>ServerRelay.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+      <Delegate Name="PrivateMemoirs.ServerRelay.ServerFailedToAcceptConnection" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>ServerRelay.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAIAJEQAACECAAEgAAAAABAAQQAAAAQAAAgAAAAAAAA=</HashCode>
+      <FileName>ServerRelay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PrivateMemoirs.USERS">
+    <Position X="3" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAgAAAAAAAAAAAAAIAAAAAAAAAQAAAAAAAgAA=</HashCode>
+      <FileName>USERS.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

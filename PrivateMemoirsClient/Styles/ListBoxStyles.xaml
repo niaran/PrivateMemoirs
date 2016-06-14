@@ -2,6 +2,38 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:PrivateMemoirsClient"
                     xmlns:sys="clr-namespace:System.Windows;assembly=System.Windows">
+    <Style TargetType="ListBoxItem">
+        <Setter Property="Margin" Value="1" />
+        <Setter Property="Padding" Value="1" />
+        <Setter Property="Background" Value="#BFBFA1" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                    <Border x:Name="brd"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <RadioButton Margin="{TemplateBinding Padding}"
+                                     Focusable="False" 
+                                     Foreground="{TemplateBinding Foreground}"
+                                     IsChecked="{Binding Path=IsSelected,
+                                                         RelativeSource={RelativeSource TemplatedParent},
+                                                         Mode=TwoWay}">
+                            <ContentPresenter />
+                        </RadioButton>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#FF93898F" />
+                            <Setter Property="Foreground" Value="Black" />
+                            <Setter Property="BorderThickness" Value="1" />
+                            <Setter Property="BorderBrush" Value="Black" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
     <!--<Style TargetType="ListBox">
         <Setter Property="Padding" Value="1"/>
         <Setter Property="Background" Value="#FFFFFFFF" />

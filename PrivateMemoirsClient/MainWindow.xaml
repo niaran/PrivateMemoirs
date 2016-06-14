@@ -7,7 +7,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:rich="clr-namespace:WpfRichText;assembly=WpfRichText"
         xmlns:user="clr-namespace:PrivateMemoirsUser"
-        Width="880"
+        Width="844"
         Height="430"
         Background="#FF93898F"
         Closing="Window_Closing"
@@ -18,11 +18,11 @@
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d">
     <Grid x:Name="Grid1" Background="#FF93898F">
-        <!--Grid.RenderTransform>
+        <Grid.RenderTransform>
             <TranslateTransform X="940" Y="0" />
-        </Grid.RenderTransform-->
+        </Grid.RenderTransform>
         <rich:RichTextEditor x:Name="sampleEditor"
-                             Margin="270,0,0,0"
+                             Margin="230,0,0,0"
                              Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}"
                              BorderBrush="#FF93898F"
                              Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
@@ -38,58 +38,55 @@
                 Margin="20,0,0,10"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Bottom"
-                Click="buttonDelete_Click">
-            <Button.Background>
-                <ImageBrush ImageSource="delete.ico" />
-            </Button.Background>
+                Click="buttonDelete_Click"
+                Style="{DynamicResource PaintButton}">
+            <BitmapImage UriSource="delete.ico" />
         </Button>
         <Button x:Name="buttonAdd"
                 Width="40"
                 Height="40"
-                Margin="100,0,0,10"
+                Margin="80,0,0,10"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Bottom"
-                Click="buttonAdd_Click">
-            <Button.Background>
-                <ImageBrush ImageSource="add.ico" />
-            </Button.Background>
+                Click="buttonAdd_Click"
+                Style="{DynamicResource PaintButton}">
+            <BitmapImage UriSource="add.ico" />
         </Button>
         <ListBox x:Name="listBox"
-                 Width="240"
+                 Width="230"
                  Margin="0,0,0,60"
                  HorizontalAlignment="Left"
+                 Background="#FF93898F"
+                 BorderBrush="#FF93898F"
                  IsSynchronizedWithCurrentItem="True"
-                 ItemsSource="{Binding Memoirs}" />
+                 ItemsSource="{Binding Memoirs, Mode=TwoWay}" />
         <Button x:Name="buttonRecord"
                 Width="40"
                 Height="40"
-                Margin="180,0,0,10"
+                Margin="140,0,0,10"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Bottom"
-                Click="buttonRecord_Click">
-            <Button.Background>
-                <ImageBrush ImageSource="record.ico" />
-            </Button.Background>
+                Click="buttonRecord_Click"
+                Style="{DynamicResource PaintButton}">
+            <BitmapImage UriSource="record.ico" />
         </Button>
     </Grid>
     <Window.Resources>
         <DataTemplate DataType="{x:Type user:Memoir}">
-            <StackPanel Margin="3" Background="LightGray">
+            <StackPanel Margin="3">
                 <DockPanel>
-                    <TextBlock Text="Дата изменения: " />
-                    <TextBlock Margin="5,0,10,0"
+                    <TextBlock Text="Дата: " />
+                    <TextBlock Margin="5,0,5,0"
                                DockPanel.Dock="Left"
-                               FontWeight="Bold"
-                               Foreground="Green"
+                               FontStyle="Italic"
                                Text="{Binding MEMOIR_DATE_CHANGE}" />
                 </DockPanel>
                 <DockPanel>
-                    <TextBlock Text="Текст: " />
-                    <TextBlock Margin="5,0,10,0"
+                    <TextBlock Text="Тема: " />
+                    <TextBlock Margin="5,0,5,0"
                                DockPanel.Dock="Left"
                                FontWeight="Bold"
-                               Foreground="Blue"
-                               Text="{Binding MEMOIR_TEXT}" />
+                               Text="{Binding MEMOIR_TITLE}" />
                 </DockPanel>
             </StackPanel>
         </DataTemplate>

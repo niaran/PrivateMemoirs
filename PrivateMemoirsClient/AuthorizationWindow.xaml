@@ -98,7 +98,7 @@
                        Grid.Column="1"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"
-                       Content="Пороль:"
+                       Content="Пароль:"
                        Foreground="White" />
                 <PasswordBox x:Name="textBoxPassword1"
                              Grid.Row="5"

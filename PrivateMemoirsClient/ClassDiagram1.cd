@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="PrivateMemoirsClient.AgentRelay" Collapsed="true">
+    <Position X="1.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABUQBJAEACXAAQCAgAAAAoAOIAAAFAWpAAAAAAACCgA=</HashCode>
+      <FileName>AgentRelay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PrivateMemoirsClient.App" Collapsed="true">
+    <Position X="3" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>App.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PrivateMemoirsClient.AuthorizationWindow" BaseTypeListCollapsed="true">
+    <Position X="8.25" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>ACACEAAAAAAQAQAAABCAAogAEAAAAAAAAAEIAAAFACg=</HashCode>
+      <FileName>AuthorizationWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="PrivateMemoirsClient.MainWindow" BaseTypeListCollapsed="true">
+    <Position X="6.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAIUAAARgEAAgAAAAAAAAAAIAAABAABSA=</HashCode>
+      <FileName>MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="PrivateMemoirsClient.NetComm" Collapsed="true">
+    <Position X="1.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAYAABAIgChgAABAAAAAAIBIAAAACAAAAQBAECABAAQ=</HashCode>
+      <FileName>NetComm.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PrivateMemoirsClient.Properties.Resources" Collapsed="true">
+    <Position X="3" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABEAAAAQAAAAAAAAAAAAAAAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PrivateMemoirsClient.Properties.Settings" Collapsed="true">
+    <Position X="3" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PrivateMemoirsUser.User">
+    <Position X="3" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAAAAAAAAAAAIEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>User.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PrivateMemoirsUser.Memoir" BaseTypeListCollapsed="true">
+    <Position X="4.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAICQAAAAAAAAAAAAAAAgAAAAQAIAAAAAQAgAhA=</HashCode>
+      <FileName>User.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
